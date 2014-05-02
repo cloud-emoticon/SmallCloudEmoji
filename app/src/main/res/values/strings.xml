@@ -18,7 +18,8 @@
     <string name="download_http_error">HTTP error.</string>
 
     <string name="pref_behaviors_title">Behaviors</string>
-    <string name="pref_auto_close_title">Auto close after copied</string>
+    <string name="pref_after_copied_title">After copied</string>
+    <string name="pref_after_copied_dialog_title">Select one action</string>
 
     <string name="pref_favorites_title">Favorites</string>
     <string name="pref_favorites_count_title">Favorites shown</string>

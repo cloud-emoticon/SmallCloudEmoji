@@ -64,7 +64,11 @@ public class MainApplication extends SmallApplication {
                     Toast.makeText(MainApplication.this, R.string.toast_copied,
                             Toast.LENGTH_SHORT).show();
                     historyDataSource.updateHistory((Emoji) emoji);
-                    if (sharedPreferences.getBoolean("auto_close", true))
+
+                    String action = sharedPreferences.getString("action_after_copied", "MINIMIZE");
+                    if (action.equals("MINIMIZE"))
+                        getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
+                    else if (action.equals("CLOSE"))
                         finish();
                 } else {
                     Intent intent = new Intent(MainApplication.this, SettingsActivity.class);

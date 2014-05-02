@@ -4,10 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <PreferenceCategory android:title="@string/pref_behaviors_title">
-        <CheckBoxPreference
-            android:key="auto_close"
-            android:title="@string/pref_auto_close_title"
-            android:defaultValue="true" />
+        <ListPreference
+            android:key="action_after_copied"
+            android:title="@string/pref_after_copied_title"
+            android:dialogTitle="@string/pref_after_copied_title"
+            android:entries="@array/pref_after_copied_entries"
+            android:entryValues="@array/pref_after_copied_values"
+            android:defaultValue="MINIMIZE" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/list_title_favorite">
