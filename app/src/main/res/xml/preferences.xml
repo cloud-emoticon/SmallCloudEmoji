@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <PreferenceCategory android:title="@string/pref_behaviors_title">
+        <CheckBoxPreference
+            android:key="auto_close"
+            android:title="@string/pref_auto_close_title"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/list_title_favorite">
+        <EditTextPreference
+            android:key="favorites_count"
+            android:title="@string/pref_favorites_count_title"
+            android:numeric="integer"
+            android:maxLength="2"
+            android:defaultValue="8" />
+        <Preference
+            android:key="favorites_clean"
+            android:title="@string/pref_favorites_clean_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_source_title">
+        <Preference
+            android:key="sync_source"
+            android:title="@string/pref_sync_title"
+            android:summary="@string/pref_sync_summary" />
+        <EditTextPreference
+            android:key="source_address"
+            android:title="@string/pref_source_address_title"
+            android:defaultValue="@string/pref_source_address_default" />
+        <Preference
+            android:key="restore_source"
+            android:title="@string/pref_restore_source_title" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_about_title">
+        <Preference
+            android:key="github"
+            android:title="@string/pref_github_title"
+            android:summary="@string/pref_github_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/pref_github_url" />
+        </Preference>
+        <Preference
+            android:key="version"
+            android:selectable="false"
+            android:title="@string/pref_version_unknown"/>
+    </PreferenceCategory>
+</PreferenceScreen>
