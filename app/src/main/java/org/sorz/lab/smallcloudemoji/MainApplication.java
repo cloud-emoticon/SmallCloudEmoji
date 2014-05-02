@@ -35,10 +35,11 @@ public class MainApplication extends SmallApplication {
         setTitle(R.string.app_name);
 
         SmallAppWindow.Attributes attr = getWindow().getAttributes();
-        attr.minHeight = 400;
-        attr.minWidth = 200;
-        attr.width = 300;
-        attr.height = 600;
+        attr.minHeight = 350;
+        attr.minWidth = 350;
+        attr.width = 500;
+        attr.height = 650;
+        getWindow().setAttributes(attr);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         historyDataSource = new HistoryDataSource(this);
