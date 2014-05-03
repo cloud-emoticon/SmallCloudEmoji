@@ -1,11 +1,14 @@
 package org.sorz.lab.smallcloudemoji;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
+import android.widget.TwoLineListItem;
 
 import java.util.List;
 
@@ -16,15 +19,19 @@ import java.util.List;
 public class MainExpandableAdapter extends BaseExpandableListAdapter {
     final private Context context;
     final private LayoutInflater inflater;
+
     private List<EmojiGroup> emojiGroups;
+    private boolean showNote;
 
 
     public MainExpandableAdapter(Context context, List<EmojiGroup> emojiGroups) {
         super();
         this.context = context;
         this.emojiGroups = emojiGroups;
-
         inflater = LayoutInflater.from(context);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        showNote = preferences.getBoolean("show_note", true);
     }
 
     @Override
@@ -82,25 +89,27 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
             ((TextView) convertView).setText(title);
             return convertView;
         } else {
-            return createGroupView(title);
+            return createGroupView(parent, title);
         }
-
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
         String title;
-        if (groupPosition == emojiGroups.size())
+        String note = "";
+        if (groupPosition == emojiGroups.size()) {
             title = context.getResources().getString(R.string.list_title_setting);
-        else
-            title = getChild(groupPosition, childPosition).toString();
-        if (convertView != null && convertView instanceof TextView) {
-            ((TextView) convertView).setText(title);
-            return convertView;
         } else {
-            return createChildView(title);
+            Emoji emoji = getChild(groupPosition, childPosition);
+            title = emoji.toString();
+            if (showNote)
+                note = emoji.getNote();
         }
+        if (convertView != null && convertView instanceof TwoLineListItem)
+            return convertChildView((TwoLineListItem) convertView, title, note);
+        else
+            return createChildView(parent, title, note);
     }
 
     @Override
@@ -108,16 +117,31 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    private View createGroupView(String title) {
-        TextView textView = (TextView) inflater.inflate(R.layout.item_group, null);
+    private View createGroupView(ViewGroup parent, String title) {
+        TextView textView = (TextView) inflater.inflate(R.layout.item_group, parent, false);
         textView.setText(title);
         return textView;
     }
 
-    private View createChildView(String title) {
-        TextView textView = (TextView) inflater.inflate(R.layout.item_child, null);
-        textView.setText(title);
-        return textView;
+    private View createChildView(ViewGroup parent, String line1, String line2) {
+        TwoLineListItem itemView =
+                (TwoLineListItem) inflater.inflate(R.layout.item_child, parent, false);
+        itemView.getText1().setText(line1);
+        if (! line2.isEmpty()) {
+            itemView.getText2().setText(line2);
+            itemView.getText2().setVisibility(View.VISIBLE);
+        }
+        return itemView;
+    }
+
+    private View convertChildView(TwoLineListItem itemView, String line1, String line2) {
+        itemView.getText1().setText(line1);
+        itemView.getText2().setText(line2);
+        if (line2.isEmpty())
+            itemView.getText2().setVisibility(View.GONE);
+        else
+            itemView.getText2().setVisibility(View.VISIBLE);
+        return itemView;
     }
 
 }

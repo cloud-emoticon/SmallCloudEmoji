@@ -13,6 +13,13 @@
             android:defaultValue="MINIMIZE" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/pref_ui_title">
+        <CheckBoxPreference
+            android:key="show_note"
+            android:title="@string/pref_show_note_title"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/list_title_favorite">
         <EditTextPreference
             android:key="favorites_count"
