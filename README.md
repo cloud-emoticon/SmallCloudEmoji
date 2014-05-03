@@ -3,6 +3,7 @@ A lightweight version of
 [Cloud Emoticon](https://github.com/KTachibanaM/cloudemoji), 
 designed for Sony products.
 
+[![Get it on Google Play](https://developer.android.com/images/brand/en_generic_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=org.sorz.lab.smallcloudemoji)
 
 ## What's Cloud Emoticon
 
