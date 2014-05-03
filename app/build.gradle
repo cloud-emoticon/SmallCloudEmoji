@@ -4,6 +4,10 @@ android {
     compileSdkVersion "Sony:Sony Add-on SDK 2.1:16"
     buildToolsVersion "19.0.3"
 
+    lintOptions {
+        abortOnError false
+    }
+
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
