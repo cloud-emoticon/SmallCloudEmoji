@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -27,6 +26,7 @@ import java.util.List;
 public class MainApplication extends SmallApplication {
     private SharedPreferences sharedPreferences;
     private HistoryDataSource historyDataSource;
+    private List<EmojiGroup> emojiGroups;
 
     @Override
     public void onCreate() {
@@ -44,9 +44,10 @@ public class MainApplication extends SmallApplication {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         historyDataSource = new HistoryDataSource(this);
 
-        ExpandableListView listView =
+        loadAllGroupsOrDownload();
+        final ExpandableListView listView =
                 (ExpandableListView) findViewById(R.id.expandableListView);
-        final ExpandableListAdapter adapter = getListAdapterWithData();
+        final MainExpandableAdapter adapter = new MainExpandableAdapter(this, emojiGroups);
         listView.setAdapter(adapter);
         listView.expandGroup(0, false);
         listView.expandGroup(adapter.getGroupCount() - 1, false);
@@ -70,6 +71,10 @@ public class MainApplication extends SmallApplication {
                         getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
                     else if (action.equals("CLOSE"))
                         finish();
+                    if (! action.equals("CLOSE")) {
+                        updateFavoriteGroup();
+                        adapter.notifyDataSetChanged();
+                    }
                 } else {
                     Intent intent = new Intent(MainApplication.this, SettingsActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -98,27 +103,57 @@ public class MainApplication extends SmallApplication {
     }
 
 
-    private ExpandableListAdapter getListAdapterWithData() {
-        List<EmojiGroup> emojiGroups = new ArrayList<EmojiGroup>();
+    private void loadAllGroupsOrDownload() {
+        if (emojiGroups == null)
+            emojiGroups = new ArrayList<EmojiGroup>();
 
-        // Add favorite group:
+        updateFavoriteGroup();
+        updateCategoryGroups();
+
+        // TODO: Download if it's empty.
+    }
+
+    /**
+     * Read favorite group into emojiGroups.
+     * Create or update.
+     */
+    private void updateFavoriteGroup() {
         int count = Integer.parseInt(sharedPreferences.getString("favorites_count", "8"));
         EmojiGroup favoriteGroup = new EmojiGroup(
                 getResources().getString(R.string.list_title_favorite),
                 Arrays.asList(historyDataSource.getFavorites(count)));
-        emojiGroups.add(favoriteGroup);
+        if (emojiGroups.size() == 0)
+            emojiGroups.add(favoriteGroup);
+        else
+            emojiGroups.set(0, favoriteGroup);
+    }
 
-        // Add all emojis:
+    /**
+     * Read category groups into emojiGroups.
+     * Create or update.
+     */
+    private void updateCategoryGroups() {
+        List<EmojiGroup> categoryGroups;
         try {
-            List<EmojiGroup> xmlGroups = XmlSourceParser.parserAll(this, "emojis.xml");
-            emojiGroups.addAll(xmlGroups);
+            categoryGroups = XmlSourceParser.parserAll(this, "emojis.xml");
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         } catch (XmlPullParserException e) {
             e.printStackTrace();
+            return;
         }
-
-        return new MainExpandableAdapter(this, emojiGroups);
+        if (emojiGroups.size() <= 1) {
+            // Only a favorite group in emojiGroups.
+            emojiGroups.addAll(categoryGroups);
+        } else {
+            // Remove all old category groups.
+            int size = emojiGroups.size();
+            for (int i=1; i < size; ++i)
+                emojiGroups.remove(i);
+            // Add new groups.
+            emojiGroups.addAll(categoryGroups);
+        }
     }
 
 }
