@@ -1,7 +1,7 @@
 <resources>
 
     <string name="action_close">关闭</string>
-    <string name="app_name">云颜文字</string>
+    <string name="app_name">小云颜文字</string>
     <string name="download_fail">同步失败：%s</string>
     <string name="download_http_error">超文本传输协议错误</string>
     <string name="download_io_exception">无法连接到服务器喵</string>
