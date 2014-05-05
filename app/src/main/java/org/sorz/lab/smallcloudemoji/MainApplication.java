@@ -27,6 +27,7 @@ public class MainApplication extends SmallApplication {
     private SharedPreferences sharedPreferences;
     private HistoryDataSource historyDataSource;
     private List<EmojiGroup> emojiGroups;
+    private MainExpandableAdapter adapter;
 
     @Override
     public void onCreate() {
@@ -47,7 +48,7 @@ public class MainApplication extends SmallApplication {
         loadAllGroupsOrDownload();
         final ExpandableListView listView =
                 (ExpandableListView) findViewById(R.id.expandableListView);
-        final MainExpandableAdapter adapter = new MainExpandableAdapter(this, emojiGroups);
+        adapter = new MainExpandableAdapter(this, emojiGroups);
         listView.setAdapter(adapter);
         listView.expandGroup(0, false);
         listView.expandGroup(adapter.getGroupCount() - 1, false);
@@ -110,7 +111,24 @@ public class MainApplication extends SmallApplication {
         updateFavoriteGroup();
         updateCategoryGroups();
 
-        // TODO: Download if it's empty.
+        // If all is empty, auto sync source.
+        if (emojiGroups.size() == 1 && emojiGroups.get(0).size() == 0) {
+
+            // Minimize the windows rather than mask the process dialog.
+            getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
+
+            String sourceUrl = sharedPreferences.getString("sync_source",
+                    getResources().getString(R.string.pref_source_address_default));
+            new DownloadXmlAsyncTask(this) {
+                @Override
+                protected void onPostExecute(Integer result) {
+                    super.onPostExecute(result);
+                    updateCategoryGroups();
+                    adapter.notifyDataSetChanged();
+                    getWindow().setWindowState(SmallAppWindow.WindowState.NORMAL);
+                }
+            }.execute(sourceUrl, "emojis.xml");
+        }
     }
 
     /**
