@@ -10,6 +10,7 @@
     <string name="download_no_found">找不到（404）</string>
     <string name="download_success">同步完成</string>
     <string name="download_title">下载中</string>
+    <string name="download_file_operation_error">读写文件时出错了喵</string>
     <string name="list_title_favorite">最近使用</string>
     <string name="list_title_options">选项</string>
     <string name="list_title_setting">修改设置</string>

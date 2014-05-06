@@ -2,6 +2,7 @@ package org.sorz.lab.smallcloudemoji;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -20,6 +21,10 @@ import java.net.URL;
 class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
     private Context context;
     private ProgressDialog progressDialog;
+    private File targetFile;
+    private File temporaryFile;
+
+    private static final int CANCELLED = -1;
 
     public DownloadXmlAsyncTask(Context context) {
         super();
@@ -32,14 +37,24 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
         progressDialog = new ProgressDialog(context);
         progressDialog.setTitle(R.string.download_title);
         progressDialog.setMessage(context.getString(R.string.download_message));
-        progressDialog.setCancelable(false);
         progressDialog.setMax(100);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(true);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                cancel(true);
+            }
+        });
         progressDialog.show();
     }
 
     @Override
     protected Integer doInBackground(String... params) {
+        targetFile = new File(context.getFilesDir(), params[1]);
+        temporaryFile = new File(context.getFilesDir(), params[1] + ".tmp");
+
         InputStream inputStream = null;
         OutputStream outputStream = null;
         HttpURLConnection connection = null;
@@ -56,9 +71,7 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
             int fileLength = connection.getContentLength();
             int totalReceived = 0;
             inputStream = connection.getInputStream();
-            File file = new File(context.getFilesDir(), params[1]);
-
-            outputStream = new FileOutputStream(file);
+            outputStream = new FileOutputStream(temporaryFile);
 
             byte buffer[] = new byte[4096];
             int received;
@@ -67,6 +80,9 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
                 if (fileLength > 0)
                     publishProgress((int) 100.0 * totalReceived / fileLength);
                 outputStream.write(buffer, 0, received);
+
+                if (isCancelled())
+                    return CANCELLED;
             }
 
         } catch (MalformedURLException e) {
@@ -98,14 +114,30 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
 
     @Override
     protected void onPostExecute(Integer result) {
+        progressDialog.dismiss();
         if (R.string.download_success == result) {
-            Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
+            targetFile.delete();
+            if (! temporaryFile.renameTo(targetFile.getAbsoluteFile()))
+                Toast.makeText(context, R.string.download_file_operation_error,
+                        Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(context, R.string.download_success, Toast.LENGTH_SHORT).show();
         } else {
             String message = String.format(
                     context.getString(R.string.download_fail),
                     context.getString(result));
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            temporaryFile.delete();
         }
-        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onCancelled(Integer result) {
+        if (result != CANCELLED) {
+            onPostExecute(result);
+        } else {
+            progressDialog.dismiss();
+            temporaryFile.delete();
+        }
     }
 }
