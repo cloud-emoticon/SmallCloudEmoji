@@ -1,6 +1,8 @@
 package org.sorz.lab.smallcloudemoji;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -39,11 +41,22 @@ public class SettingsFragment extends PreferenceFragment {
         favoritesCleanPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                HistoryDataSource historyDataSource = new HistoryDataSource(context);
-                historyDataSource.cleanHistory();
-                Toast.makeText(context, R.string.pref_favorites_clean_done,
-                        Toast.LENGTH_SHORT).show();
-                return false;
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle(R.string.pref_favorites_clean_confirm_title)
+                        .setMessage(R.string.pref_favorites_clean_confirm_msg)
+                        .setCancelable(true);
+                builder.setPositiveButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        HistoryDataSource historyDataSource = new HistoryDataSource(context);
+                        historyDataSource.cleanHistory();
+                        Toast.makeText(context, R.string.pref_favorites_clean_done,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.show();
+                return true;
             }
         });
 

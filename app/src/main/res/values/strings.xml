@@ -28,6 +28,8 @@
     <string name="pref_favorites_count_summary">max %s items</string>
     <string name="pref_favorites_clean_title">Clean all favorites</string>
     <string name="pref_favorites_clean_done">All favorites cleaned.</string>
+    <string name="pref_favorites_clean_confirm_title">Are you sure?</string>
+    <string name="pref_favorites_clean_confirm_msg">This action will clean all your and favorite emoticons and history permanently.</string>
 
     <string name="pref_source_title">Source</string>
     <string name="pref_sync_title">Refresh</string>

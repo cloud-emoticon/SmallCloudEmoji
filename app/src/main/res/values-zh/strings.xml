@@ -19,6 +19,8 @@
     <string name="pref_behaviors_title">行为</string>
     <string name="pref_favorites_clean_done">使用记录已清空</string>
     <string name="pref_favorites_clean_title">清空记录</string>
+    <string name="pref_favorites_clean_confirm_title">确认清空？</string>
+    <string name="pref_favorites_clean_confirm_msg">所有颜文字的使用记录都会消失不见哟。</string>
     <string name="pref_favorites_count_summary">最多 %s 条</string>
     <string name="pref_favorites_count_title">显示条数</string>
     <string name="pref_favorites_title">最近使用</string>
