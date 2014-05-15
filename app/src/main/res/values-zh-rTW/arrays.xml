@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_after_copied_entries">
+        <item>最小化到側邊</item>
+        <item>關閉窗口</item>
+        <item>什麼也不做</item>
+    </string-array>
+</resources>
