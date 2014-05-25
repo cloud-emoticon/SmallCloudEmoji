@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -27,7 +28,7 @@ public class MainApplication extends SmallApplication {
     private SharedPreferences sharedPreferences;
     private HistoryDataSource historyDataSource;
     private List<EmojiGroup> emojiGroups;
-    private MainExpandableAdapter adapter;
+    private BaseExpandableListAdapter adapter;
 
     @Override
     public void onCreate() {
@@ -57,7 +58,7 @@ public class MainApplication extends SmallApplication {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                         int childPosition, long id) {
-                Object emoji = adapter.getChild(groupPosition, childPosition);
+                Object emoji = v.getTag();
                 if (emoji != null) {
                     ClipboardManager clipboard =
                             (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -76,7 +77,7 @@ public class MainApplication extends SmallApplication {
                         updateFavoriteGroup();
                         adapter.notifyDataSetChanged();
                     }
-                } else {
+                } else {  // is the settings item.
                     Intent intent = new Intent(MainApplication.this, SettingsActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
@@ -85,7 +86,6 @@ public class MainApplication extends SmallApplication {
                 return true;
             }
         });
-
     }
 
     @Override

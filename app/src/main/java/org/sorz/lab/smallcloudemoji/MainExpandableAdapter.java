@@ -96,20 +96,17 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
-        String title;
-        String note = "";
+        if (convertView == null || convertView instanceof RelativeLayout)
+            convertView = inflater.inflate(R.layout.item_child, parent, false);
+
         if (groupPosition == emojiGroups.size()) {
-            title = context.getResources().getString(R.string.list_title_setting);
+            String title = context.getResources().getString(R.string.list_title_setting);
+            convertSettingsChildView(convertView, title);
         } else {
             Emoji emoji = getChild(groupPosition, childPosition);
-            title = emoji.toString();
-            if (showNote)
-                note = emoji.getNote();
+            convertEmojiChildView(convertView, emoji);
         }
-        if (convertView != null && convertView instanceof RelativeLayout)
-            return convertChildView(convertView, title, note);
-        else
-            return createChildView(parent, title, note);
+        return convertView;
     }
 
     @Override
@@ -123,29 +120,24 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         return textView;
     }
 
-    private View createChildView(ViewGroup parent, String line1, String line2) {
-        View itemView = inflater.inflate(R.layout.item_child, parent, false);
+    private void convertSettingsChildView(View itemView, String title) {
         TextView text1 = (TextView) itemView.findViewById(R.id.text1);
         TextView text2 = (TextView) itemView.findViewById(R.id.text2);
-        text1.setText(line1);
-        if (! line2.isEmpty()) {
-            text2.setText(line2);
-            text2.setVisibility(View.VISIBLE);
-        }
-        return itemView;
+        text1.setText(title);
+        text2.setVisibility(View.GONE);
     }
 
-    private View convertChildView(View itemView, String line1, String line2) {
+    private void convertEmojiChildView(View itemView, Emoji emoji) {
         TextView text1 = (TextView) itemView.findViewById(R.id.text1);
         TextView text2 = (TextView) itemView.findViewById(R.id.text2);
-        text1.setText(line1);
-        text2.setText(line2);
-
-        if (line2.isEmpty())
-            text2.setVisibility(View.GONE);
-        else
+        text1.setText(emoji.toString());
+        if (showNote && ! emoji.getNote().isEmpty()) {
+            text2.setText(emoji.getNote());
             text2.setVisibility(View.VISIBLE);
-        return itemView;
+        } else {
+            text2.setVisibility(View.GONE);
+        }
+        itemView.setTag(emoji);
     }
 
 }
