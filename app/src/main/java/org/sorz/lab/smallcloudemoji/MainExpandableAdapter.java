@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TwoLineListItem;
 
 import java.util.List;
 
@@ -106,8 +106,8 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
             if (showNote)
                 note = emoji.getNote();
         }
-        if (convertView != null && convertView instanceof TwoLineListItem)
-            return convertChildView((TwoLineListItem) convertView, title, note);
+        if (convertView != null && convertView instanceof RelativeLayout)
+            return convertChildView(convertView, title, note);
         else
             return createChildView(parent, title, note);
     }
@@ -124,23 +124,27 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     private View createChildView(ViewGroup parent, String line1, String line2) {
-        TwoLineListItem itemView =
-                (TwoLineListItem) inflater.inflate(R.layout.item_child, parent, false);
-        itemView.getText1().setText(line1);
+        View itemView = inflater.inflate(R.layout.item_child, parent, false);
+        TextView text1 = (TextView) itemView.findViewById(R.id.text1);
+        TextView text2 = (TextView) itemView.findViewById(R.id.text2);
+        text1.setText(line1);
         if (! line2.isEmpty()) {
-            itemView.getText2().setText(line2);
-            itemView.getText2().setVisibility(View.VISIBLE);
+            text2.setText(line2);
+            text2.setVisibility(View.VISIBLE);
         }
         return itemView;
     }
 
-    private View convertChildView(TwoLineListItem itemView, String line1, String line2) {
-        itemView.getText1().setText(line1);
-        itemView.getText2().setText(line2);
+    private View convertChildView(View itemView, String line1, String line2) {
+        TextView text1 = (TextView) itemView.findViewById(R.id.text1);
+        TextView text2 = (TextView) itemView.findViewById(R.id.text2);
+        text1.setText(line1);
+        text2.setText(line2);
+
         if (line2.isEmpty())
-            itemView.getText2().setVisibility(View.GONE);
+            text2.setVisibility(View.GONE);
         else
-            itemView.getText2().setVisibility(View.VISIBLE);
+            text2.setVisibility(View.VISIBLE);
         return itemView;
     }
 
