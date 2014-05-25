@@ -28,8 +28,12 @@
             android:maxLength="2"
             android:defaultValue="8" />
         <Preference
-            android:key="favorites_clean"
-            android:title="@string/pref_favorites_clean_title" />
+            android:key="history_clean"
+            android:title="@string/pref_history_clean_title" />
+        <Preference
+            android:key="star_clean"
+            android:title="@string/pref_star_clean_title"
+            android:summary="@string/pref_star_clean_summary" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_source_title">

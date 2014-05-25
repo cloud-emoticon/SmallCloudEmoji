@@ -24,8 +24,10 @@ public class HistoryDataSource implements Closeable {
             + "last_use = CURRENT_TIMESTAMP, note = ? WHERE id =";
     private final static String SQL_UPDATE_SET_STAR = "UPDATE history SET top = 1 WHERE id = ";
     private final static String SQL_UPDATE_UNSET_STAR = "UPDATE history SET top = 0 WHERE id = ";
-    private final static String SQL_DELETE_IF_UNUSED = "DELETE FROM history WHERE times = 0 AND id = ";
-    private final static String SQL_DELETE_ALL = "DELETE FROM history";
+    private final static String SQL_UPDATE_CLEAN_STARS = "UPDATE history SET top = 0";
+    private final static String SQL_UPDATE_CLEAN_HISTORY = "UPDATE history SET times = 0 WHERE top = 1";
+    private final static String SQL_DELETE_UNUSED = "DELETE FROM history WHERE times = 0 AND top = 0 ";
+    private final static String SQL_DELETE_HISTORY = "DELETE FROM history WHERE top == 0";
 
 
     public HistoryDataSource(Context context) {
@@ -68,12 +70,18 @@ public class HistoryDataSource implements Closeable {
         int id = searchAndGetEmojiId(emoji);
         if (id == -1) // No exists in history.
             return;
-        database.execSQL(SQL_DELETE_IF_UNUSED + id);
         database.execSQL(SQL_UPDATE_UNSET_STAR + id);
+        database.execSQL(SQL_DELETE_UNUSED);
+    }
+
+    public void cleanAllStars() {
+        database.execSQL(SQL_UPDATE_CLEAN_STARS);
+        database.execSQL(SQL_DELETE_UNUSED);
     }
 
     public void cleanHistory() {
-        database.execSQL(SQL_DELETE_ALL);
+        database.execSQL(SQL_DELETE_HISTORY);
+        database.execSQL(SQL_UPDATE_CLEAN_HISTORY);
     }
 
     /**

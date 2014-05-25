@@ -35,23 +35,35 @@ public class SettingsFragment extends PreferenceFragment {
         favoritesCountPreference.setSummary(String.format(favoritesCountPreferenceSummary,
                 favoritesCountPreference.getText()));
 
+        // Usage history clean
+        Preference historyCleanPreference = findPreference("history_clean");
+        historyCleanPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                HistoryDataSource historyDataSource = new HistoryDataSource(context);
+                historyDataSource.cleanHistory();
+                Toast.makeText(context, R.string.pref_history_clean_done,
+                        Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
 
-        // Favorites clean
-        Preference favoritesCleanPreference = findPreference("favorites_clean");
-        favoritesCleanPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        // Stars clean
+        Preference starCleanPreference = findPreference("star_clean");
+        starCleanPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(R.string.pref_favorites_clean_confirm_title)
-                        .setMessage(R.string.pref_favorites_clean_confirm_msg)
+                builder.setTitle(R.string.pref_star_clean_confirm_title)
+                        .setMessage(R.string.pref_star_clean_confirm_msg)
                         .setCancelable(true);
                 builder.setPositiveButton(android.R.string.ok,
                         new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         HistoryDataSource historyDataSource = new HistoryDataSource(context);
-                        historyDataSource.cleanHistory();
-                        Toast.makeText(context, R.string.pref_favorites_clean_done,
+                        historyDataSource.cleanAllStars();
+                        Toast.makeText(context, R.string.pref_star_clean_done,
                                 Toast.LENGTH_SHORT).show();
                     }
                 });

@@ -18,10 +18,13 @@
     <string name="pref_after_copied_dialog_title">选择一个动作</string>
     <string name="pref_after_copied_title">复制后…</string>
     <string name="pref_behaviors_title">行为</string>
-    <string name="pref_favorites_clean_done">使用记录已清空</string>
-    <string name="pref_favorites_clean_title">清空记录</string>
-    <string name="pref_favorites_clean_confirm_title">确认清空？</string>
-    <string name="pref_favorites_clean_confirm_msg">所有颜文字的使用记录都会消失不见哟。</string>
+    <string name="pref_history_clean_done">使用记录已清空</string>
+    <string name="pref_history_clean_title">清空使用记录</string>
+    <string name="pref_star_clean_confirm_title">确认清空？</string>
+    <string name="pref_star_clean_confirm_msg">所有星标都会不见哦。</string>
+    <string name="pref_star_clean_title">清除所有星星</string>
+    <string name="pref_star_clean_summary">长按某个颜文字添加或清除单个星标。</string>
+    <string name="pref_star_clean_done">所有星标已清除</string>
     <string name="pref_favorites_count_summary">最多 %s 条</string>
     <string name="pref_favorites_count_title">显示条数</string>
     <string name="pref_favorites_title">最近使用</string>
