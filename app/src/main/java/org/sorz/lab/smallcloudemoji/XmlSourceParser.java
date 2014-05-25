@@ -38,7 +38,7 @@ public class XmlSourceParser {
         for (RepoXmlParser.Category category : emojis.categories) {
             EmojiGroup group = new EmojiGroup(category.name);
             for (RepoXmlParser.Entry entry : category.entries)
-                group.add(new Emoji(entry.string, entry.note));
+                group.add(new Emoji(entry.string, entry.note, false));
             emojiGroups.add(group);
         }
         return emojiGroups;

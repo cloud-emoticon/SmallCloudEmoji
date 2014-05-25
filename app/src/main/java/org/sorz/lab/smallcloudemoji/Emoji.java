@@ -6,19 +6,20 @@ package org.sorz.lab.smallcloudemoji;
 public class Emoji {
     private final String entity;
     private final String note;
+    private final boolean star;
 
-    public Emoji(String entity, String note) {
+    public Emoji(String entity, String note, boolean star) {
         this.entity = entity;
         this.note = note;
-    }
-
-    public Emoji(String entity) {
-        this.entity = entity;
-        this.note = "";
+        this.star = star;
     }
 
     public String getNote() {
         return note;
+    }
+
+    public boolean hasStar() {
+        return star;
     }
 
     @Override

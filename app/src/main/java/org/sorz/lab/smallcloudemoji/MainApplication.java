@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
@@ -83,6 +84,23 @@ public class MainApplication extends SmallApplication {
                     startActivity(intent);
                     finish();
                 }
+                return true;
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Object emojiObject = view.getTag();
+                if (emojiObject == null)
+                    return false;
+                Emoji emoji = (Emoji) emojiObject;
+                if (emoji.hasStar())
+                    historyDataSource.unsetStar(emoji);
+                else
+                    historyDataSource.setStar(emoji);
+                updateFavoriteGroup();
+                adapter.notifyDataSetChanged();
                 return true;
             }
         });
