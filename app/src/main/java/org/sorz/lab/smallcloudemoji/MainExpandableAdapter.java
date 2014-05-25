@@ -58,8 +58,17 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         List<Emoji> group = getGroup(groupPosition);
         if (group == null)
             return null;
-        else
-            return group.get(childPosition);
+        Emoji emoji = group.get(childPosition);
+
+        // Due to the star which is only tagged in favorites group.
+        // Check and use it if which is also in favorites group.
+        if (groupPosition != 0) { // != favorites group
+            EmojiGroup favorites = getGroup(0);
+            int index = favorites.indexOf(emoji);
+            if (index != -1)
+                emoji = favorites.get(index);
+        }
+        return emoji;
     }
 
     @Override

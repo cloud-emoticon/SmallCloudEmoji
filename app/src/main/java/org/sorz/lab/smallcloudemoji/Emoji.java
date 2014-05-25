@@ -27,4 +27,16 @@ public class Emoji {
         return this.entity;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Emoji)
+            if (((Emoji) o).entity.equals(entity))
+                return true;
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return entity.hashCode();
+    }
 }
