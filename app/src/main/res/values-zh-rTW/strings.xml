@@ -23,7 +23,7 @@
     <string name="pref_star_clean_confirm_title">確認清空？</string>
     <string name="pref_star_clean_confirm_msg">所有星標都會消失不見喲。</string>
     <string name="pref_star_clean_title">清除所有星星</string>
-    <string name="pref_star_clean_summary">長按某個顏文字以添加或刪除單個星標。</string>
+    <string name="pref_star_clean_summary">長按某個顏文字以添加或刪除單個星標</string>
     <string name="pref_star_clean_done">所有星標已清除</string>
     <string name="pref_favorites_count_summary">最多 %s 條</string>
     <string name="pref_favorites_count_title">顯示條數</string>

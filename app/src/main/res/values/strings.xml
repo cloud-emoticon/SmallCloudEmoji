@@ -30,7 +30,7 @@
     <string name="pref_history_clean_title">Clean usage history</string>
     <string name="pref_history_clean_done">Usage history has gone.</string>
     <string name="pref_star_clean_title">Unset all stars</string>
-    <string name="pref_star_clean_summary">Long click on a emoticon to tag a star.</string>
+    <string name="pref_star_clean_summary">Long click on a emoticon to tag a star</string>
     <string name="pref_star_clean_done">All stars have gone.</string>
     <string name="pref_star_clean_confirm_title">Are you sure?</string>
     <string name="pref_star_clean_confirm_msg">This action will clean all stars permanently.</string>
