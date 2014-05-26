@@ -35,39 +35,39 @@ public class HistoryDataSource implements Closeable {
         database = dbOpenHelper.getWritableDatabase();
     }
 
-    public Emoji[] getFavorites(int count) {
+    public Emoticon[] getFavorites(int count) {
         Cursor cursor = database.rawQuery(SQL_SELECT_FAV + count, null);
-        Emoji[] emojis = new Emoji[cursor.getCount()];
+        Emoticon[] emoticons = new Emoticon[cursor.getCount()];
         int i = 0;
         while(cursor.moveToNext())
-            emojis[i++] = new Emoji(cursor.getString(0),
+            emoticons[i++] = new Emoticon(cursor.getString(0),
                     cursor.getString(1), cursor.getInt(2) != 0);
         cursor.close();
-        return emojis;
+        return emoticons;
     }
 
     /**
-     * Add the emoji into history if it does not exist.
+     * Add the emoticon into history if it does not exist.
      * Or update the times, last used time (and note).
      */
-    public void updateHistory(Emoji emoji) {
-        int id = searchAndGetEmojiId(emoji);
+    public void updateHistory(Emoticon emoticon) {
+        int id = searchAndGetEmojiId(emoticon);
         if (id == -1)  // No exists in history.
-            database.execSQL(SQL_INSERT, new String[]{emoji.toString(), emoji.getNote()});
+            database.execSQL(SQL_INSERT, new String[]{emoticon.toString(), emoticon.getNote()});
         else
-            database.execSQL(SQL_UPDATE_TIMES_NOTE + id, new String[]{emoji.getNote()});
+            database.execSQL(SQL_UPDATE_TIMES_NOTE + id, new String[]{emoticon.getNote()});
     }
 
-    public void setStar(Emoji emoji) {
-        int id = searchAndGetEmojiId(emoji);
+    public void setStar(Emoticon emoticon) {
+        int id = searchAndGetEmojiId(emoticon);
         if (id == -1) // No exists in history.
-            database.execSQL(SQL_INSERT_STAR, new String[]{emoji.toString(), emoji.getNote()});
+            database.execSQL(SQL_INSERT_STAR, new String[]{emoticon.toString(), emoticon.getNote()});
         else
             database.execSQL(SQL_UPDATE_SET_STAR + id);
     }
 
-    public void unsetStar(Emoji emoji) {
-        int id = searchAndGetEmojiId(emoji);
+    public void unsetStar(Emoticon emoticon) {
+        int id = searchAndGetEmojiId(emoticon);
         if (id == -1) // No exists in history.
             return;
         database.execSQL(SQL_UPDATE_UNSET_STAR + id);
@@ -85,11 +85,11 @@ public class HistoryDataSource implements Closeable {
     }
 
     /**
-     * Check if the emoji is in history table.
-     * @return -1 or the ID of emoji if it exists.
+     * Check if the emoticon is in history table.
+     * @return -1 or the ID of emoticon if it exists.
      */
-    private int searchAndGetEmojiId(Emoji emoji) {
-        Cursor cursor = database.rawQuery(SQL_SELECT_BY_EMOJI, new String[] {emoji.toString()});
+    private int searchAndGetEmojiId(Emoticon emoticon) {
+        Cursor cursor = database.rawQuery(SQL_SELECT_BY_EMOJI, new String[] {emoticon.toString()});
         int id;
         if (cursor.getCount() == 0) {
             id = -1;

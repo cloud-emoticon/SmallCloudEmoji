@@ -6,16 +6,16 @@ import java.util.Collection;
 /**
  * Hold the group name and a list of emojis.
  */
-public class EmojiGroup extends ArrayList<Emoji> {
+public class EmoticonGroup extends ArrayList<Emoticon> {
     private final String groupName;
 
-    public EmojiGroup(String groupName) {
+    public EmoticonGroup(String groupName) {
         super();
         this.groupName = groupName;
     }
 
-    public EmojiGroup(String groupName, Collection<Emoji> emojis) {
-        super(emojis);
+    public EmoticonGroup(String groupName, Collection<Emoticon> emoticons) {
+        super(emoticons);
         this.groupName = groupName;
     }
 

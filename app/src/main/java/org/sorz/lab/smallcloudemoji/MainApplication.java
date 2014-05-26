@@ -28,7 +28,7 @@ import java.util.List;
 public class MainApplication extends SmallApplication {
     private SharedPreferences sharedPreferences;
     private HistoryDataSource historyDataSource;
-    private List<EmojiGroup> emojiGroups;
+    private List<EmoticonGroup> emoticonGroups;
     private BaseExpandableListAdapter adapter;
 
     @Override
@@ -50,7 +50,7 @@ public class MainApplication extends SmallApplication {
         loadAllGroupsOrDownload();
         final ExpandableListView listView =
                 (ExpandableListView) findViewById(R.id.expandableListView);
-        adapter = new MainExpandableAdapter(this, emojiGroups);
+        adapter = new MainExpandableAdapter(this, emoticonGroups);
         listView.setAdapter(adapter);
         listView.expandGroup(0, false);
         listView.expandGroup(adapter.getGroupCount() - 1, false);
@@ -59,15 +59,15 @@ public class MainApplication extends SmallApplication {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                         int childPosition, long id) {
-                Object emoji = v.getTag();
-                if (emoji != null) {
+                Object emoticon = v.getTag();
+                if (emoticon != null) {
                     ClipboardManager clipboard =
                             (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clipData = ClipData.newPlainText("emoji", emoji.toString());
+                    ClipData clipData = ClipData.newPlainText("emoticon", emoticon.toString());
                     clipboard.setPrimaryClip(clipData);
                     Toast.makeText(MainApplication.this, R.string.toast_copied,
                             Toast.LENGTH_SHORT).show();
-                    historyDataSource.updateHistory((Emoji) emoji);
+                    historyDataSource.updateHistory((Emoticon) emoticon);
 
                     String action = sharedPreferences.getString("action_after_copied", "MINIMIZE");
                     if (action.equals("MINIMIZE"))
@@ -94,11 +94,11 @@ public class MainApplication extends SmallApplication {
                 Object emojiObject = view.getTag();
                 if (emojiObject == null)
                     return false;
-                Emoji emoji = (Emoji) emojiObject;
-                if (emoji.hasStar())
-                    historyDataSource.unsetStar(emoji);
+                Emoticon emoticon = (Emoticon) emojiObject;
+                if (emoticon.hasStar())
+                    historyDataSource.unsetStar(emoticon);
                 else
-                    historyDataSource.setStar(emoji);
+                    historyDataSource.setStar(emoticon);
                 updateFavoriteGroup();
                 adapter.notifyDataSetChanged();
                 return true;
@@ -123,14 +123,14 @@ public class MainApplication extends SmallApplication {
 
 
     private void loadAllGroupsOrDownload() {
-        if (emojiGroups == null)
-            emojiGroups = new ArrayList<EmojiGroup>();
+        if (emoticonGroups == null)
+            emoticonGroups = new ArrayList<EmoticonGroup>();
 
         updateFavoriteGroup();
         updateCategoryGroups();
 
         // If all is empty, auto sync source.
-        if (emojiGroups.size() == 1 && emojiGroups.get(0).size() == 0) {
+        if (emoticonGroups.size() == 1 && emoticonGroups.get(0).size() == 0) {
 
             // Minimize the windows rather than mask the process dialog.
             getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
@@ -150,26 +150,26 @@ public class MainApplication extends SmallApplication {
     }
 
     /**
-     * Read favorite group into emojiGroups.
+     * Read favorite group into emoticonGroups.
      * Create or update.
      */
     private void updateFavoriteGroup() {
         int count = Integer.parseInt(sharedPreferences.getString("favorites_count", "8"));
-        EmojiGroup favoriteGroup = new EmojiGroup(
+        EmoticonGroup favoriteGroup = new EmoticonGroup(
                 getResources().getString(R.string.list_title_favorite),
                 Arrays.asList(historyDataSource.getFavorites(count)));
-        if (emojiGroups.size() == 0)
-            emojiGroups.add(favoriteGroup);
+        if (emoticonGroups.size() == 0)
+            emoticonGroups.add(favoriteGroup);
         else
-            emojiGroups.set(0, favoriteGroup);
+            emoticonGroups.set(0, favoriteGroup);
     }
 
     /**
-     * Read category groups into emojiGroups.
+     * Read category groups into emoticonGroups.
      * Create or update.
      */
     private void updateCategoryGroups() {
-        List<EmojiGroup> categoryGroups;
+        List<EmoticonGroup> categoryGroups;
         try {
             categoryGroups = XmlSourceParser.parserAll(this, "emojis.xml");
         } catch (IOException e) {
@@ -179,16 +179,16 @@ public class MainApplication extends SmallApplication {
             e.printStackTrace();
             return;
         }
-        if (emojiGroups.size() <= 1) {
-            // Only a favorite group in emojiGroups.
-            emojiGroups.addAll(categoryGroups);
+        if (emoticonGroups.size() <= 1) {
+            // Only a favorite group in emoticonGroups.
+            emoticonGroups.addAll(categoryGroups);
         } else {
             // Remove all old category groups.
-            int size = emojiGroups.size();
+            int size = emoticonGroups.size();
             for (int i=1; i < size; ++i)
-                emojiGroups.remove(i);
+                emoticonGroups.remove(i);
             // Add new groups.
-            emojiGroups.addAll(categoryGroups);
+            emoticonGroups.addAll(categoryGroups);
         }
     }
 

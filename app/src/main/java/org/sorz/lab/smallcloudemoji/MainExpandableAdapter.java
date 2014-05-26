@@ -20,14 +20,14 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     final private Context context;
     final private LayoutInflater inflater;
 
-    private List<EmojiGroup> emojiGroups;
+    private List<EmoticonGroup> emoticonGroups;
     private boolean showNote;
 
 
-    public MainExpandableAdapter(Context context, List<EmojiGroup> emojiGroups) {
+    public MainExpandableAdapter(Context context, List<EmoticonGroup> emoticonGroups) {
         super();
         this.context = context;
-        this.emojiGroups = emojiGroups;
+        this.emoticonGroups = emoticonGroups;
         inflater = LayoutInflater.from(context);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -36,39 +36,39 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        return emojiGroups.size() + 1;  // Add one item, Settings.
+        return emoticonGroups.size() + 1;  // Add one item, Settings.
     }
 
     @Override
     public int getChildrenCount(int i) {
-        if (i == emojiGroups.size())
+        if (i == emoticonGroups.size())
             return 1;
-        return emojiGroups.get(i).size();
+        return emoticonGroups.get(i).size();
     }
 
     @Override
-    public EmojiGroup getGroup(int groupPosition) {
-        if (groupPosition >= emojiGroups.size())
+    public EmoticonGroup getGroup(int groupPosition) {
+        if (groupPosition >= emoticonGroups.size())
             return null;
-        return emojiGroups.get(groupPosition);
+        return emoticonGroups.get(groupPosition);
     }
 
     @Override
-    public Emoji getChild(int groupPosition, int childPosition) {
-        List<Emoji> group = getGroup(groupPosition);
+    public Emoticon getChild(int groupPosition, int childPosition) {
+        List<Emoticon> group = getGroup(groupPosition);
         if (group == null)
             return null;
-        Emoji emoji = group.get(childPosition);
+        Emoticon emoticon = group.get(childPosition);
 
         // Due to the star which is only tagged in favorites group.
         // Check and use it if which is also in favorites group.
         if (groupPosition != 0) { // != favorites group
-            EmojiGroup favorites = getGroup(0);
-            int index = favorites.indexOf(emoji);
+            EmoticonGroup favorites = getGroup(0);
+            int index = favorites.indexOf(emoticon);
             if (index != -1)
-                emoji = favorites.get(index);
+                emoticon = favorites.get(index);
         }
-        return emoji;
+        return emoticon;
     }
 
     @Override
@@ -90,10 +90,10 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
         String title;
-        if (groupPosition == emojiGroups.size())
+        if (groupPosition == emoticonGroups.size())
             title = context.getResources().getString(R.string.list_title_options);
         else
-            title = emojiGroups.get(groupPosition).toString();
+            title = emoticonGroups.get(groupPosition).toString();
         if (convertView != null && convertView instanceof TextView) {
             ((TextView) convertView).setText(title);
             return convertView;
@@ -108,12 +108,12 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         if (convertView == null || convertView instanceof RelativeLayout)
             convertView = inflater.inflate(R.layout.item_child, parent, false);
 
-        if (groupPosition == emojiGroups.size()) {
+        if (groupPosition == emoticonGroups.size()) {
             String title = context.getResources().getString(R.string.list_title_setting);
             convertSettingsChildView(convertView, title);
         } else {
-            Emoji emoji = getChild(groupPosition, childPosition);
-            convertEmojiChildView(convertView, emoji);
+            Emoticon emoticon = getChild(groupPosition, childPosition);
+            convertEmojiChildView(convertView, emoticon);
         }
         return convertView;
     }
@@ -138,20 +138,20 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         star.setVisibility(View.GONE);
     }
 
-    private void convertEmojiChildView(View itemView, Emoji emoji) {
+    private void convertEmojiChildView(View itemView, Emoticon emoticon) {
         TextView text1 = (TextView) itemView.findViewById(R.id.text1);
         TextView text2 = (TextView) itemView.findViewById(R.id.text2);
         View star = itemView.findViewById(R.id.star);
 
-        text1.setText(emoji.toString());
-        if (showNote && ! emoji.getNote().isEmpty()) {
-            text2.setText(emoji.getNote());
+        text1.setText(emoticon.toString());
+        if (showNote && ! emoticon.getNote().isEmpty()) {
+            text2.setText(emoticon.getNote());
             text2.setVisibility(View.VISIBLE);
         } else {
             text2.setVisibility(View.GONE);
         }
-        star.setVisibility(emoji.hasStar() ? View.VISIBLE : View.GONE);
-        itemView.setTag(emoji);
+        star.setVisibility(emoticon.hasStar() ? View.VISIBLE : View.GONE);
+        itemView.setTag(emoticon);
     }
 
 }

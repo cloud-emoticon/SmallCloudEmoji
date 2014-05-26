@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class XmlSourceParser {
 
-    public static List<EmojiGroup> parserAll(Context context, String filename)
+    public static List<EmoticonGroup> parserAll(Context context, String filename)
             throws IOException, XmlPullParserException {
         Reader reader = null;
         RepoXmlParser.Emoji emojis;
@@ -34,13 +34,13 @@ public class XmlSourceParser {
                     // Ignore
                 }
         }
-        List<EmojiGroup> emojiGroups = new ArrayList<EmojiGroup>();
+        List<EmoticonGroup> emoticonGroups = new ArrayList<EmoticonGroup>();
         for (RepoXmlParser.Category category : emojis.categories) {
-            EmojiGroup group = new EmojiGroup(category.name);
+            EmoticonGroup group = new EmoticonGroup(category.name);
             for (RepoXmlParser.Entry entry : category.entries)
-                group.add(new Emoji(entry.string, entry.note, false));
-            emojiGroups.add(group);
+                group.add(new Emoticon(entry.string, entry.note, false));
+            emoticonGroups.add(group);
         }
-        return emojiGroups;
+        return emoticonGroups;
     }
 }
