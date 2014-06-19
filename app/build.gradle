@@ -1,7 +1,7 @@
 apply plugin: 'android'
 
 android {
-    compileSdkVersion "Sony:Sony Add-on SDK 2.1:16"
+    compileSdkVersion "Sony:Sony Add-on SDK 3.0:19"
     buildToolsVersion "19.1"
 
     lintOptions {
