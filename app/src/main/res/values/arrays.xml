@@ -5,7 +5,7 @@
         <item>Close window</item>
         <item>Do nothing</item>
     </string-array>
-    <string-array name="pref_after_copied_values">
+    <string-array name="pref_after_copied_values" translatable="false">
         <item>MINIMIZE</item>
         <item>CLOSE</item>
         <item>NOTHING</item>
