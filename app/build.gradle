@@ -2,7 +2,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion "Sony:Sony Add-on SDK 3.0:19"
-    buildToolsVersion "19.1"
+    buildToolsVersion "20"
 
     lintOptions {
         abortOnError false
@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 20
         versionCode 6
         versionName "0.3.1"
     }
