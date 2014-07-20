@@ -42,5 +42,7 @@
     <string name="pref_version_unknown">未知版本</string>
     <string name="toast_copied">颜文字已复制</string>
     <string name="pref_source_address_default">https://dl.dropboxusercontent.com/u/120725807/test.xml</string>
+    <string name="title_activity_view_new_source">添加源</string>
+    <string name="source_replace_message">确认替换小云颜文字当前使用的源吗？</string>
 
 </resources>

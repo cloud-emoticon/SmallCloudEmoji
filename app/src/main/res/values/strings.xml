@@ -16,14 +16,11 @@
     <string name="download_no_found">File no found (404).</string>
     <string name="download_http_error">HTTP error.</string>
     <string name="download_file_operation_error">Something go wrong when writing files.</string>
-
     <string name="pref_behaviors_title">Behaviors</string>
     <string name="pref_after_copied_title">After copied</string>
     <string name="pref_after_copied_dialog_title">Select one action</string>
-
     <string name="pref_ui_title">UI</string>
     <string name="pref_show_note_title">Show note below emoticon</string>
-
     <string name="pref_favorites_title">Favorites</string>
     <string name="pref_favorites_count_title">Favorites shown</string>
     <string name="pref_favorites_count_summary">max %s items</string>
@@ -34,7 +31,6 @@
     <string name="pref_star_clean_done">All stars have gone.</string>
     <string name="pref_star_clean_confirm_title">Are you sure?</string>
     <string name="pref_star_clean_confirm_msg">This action will clean all stars permanently.</string>
-
     <string name="pref_source_title">Source</string>
     <string name="pref_sync_title">Refresh</string>
     <string name="pref_sync_summary">Download emoji list from source below</string>
@@ -42,13 +38,13 @@
     <string name="pref_source_address_default">https://dl.dropboxusercontent.com/u/120725807/test.xml</string>
     <string name="pref_restore_source_title">Restore default source</string>
     <string name="pref_restore_source_done">Source address has restored to default.</string>
-
     <string name="pref_about_title">About</string>
     <string name="pref_github_title">Source code</string>
     <string name="pref_github_summary">Open GitHub to view the source code</string>
     <string name="pref_github_url" translatable="false">https://github.com/sorz/SmallCloudEmoji/</string>
     <string name="pref_version_unknown">Version (unknown)</string>
     <string name="pref_version_title">Version %1$s (%2$d)</string>
-
+    <string name="title_activity_view_new_source">Add Source</string>
+    <string name="source_replace_message">Are you sure use this source to replace current one?</string>
 
 </resources>
