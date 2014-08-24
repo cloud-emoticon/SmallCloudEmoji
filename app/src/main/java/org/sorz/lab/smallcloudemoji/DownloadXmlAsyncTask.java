@@ -61,13 +61,22 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
 
         try {
             URL url = new URL(params[0]);
-            connection = (HttpURLConnection) url.openConnection();
-            int statusCode = connection.getResponseCode();
-            if (statusCode == HttpURLConnection.HTTP_NOT_FOUND)
-                return R.string.download_no_found;
-            else if (statusCode != HttpURLConnection.HTTP_OK)
+            for (int i=0; i<10; ++i) {  // Limit redirection (between HTTP and HTTPS) < 10 times.
+                connection = (HttpURLConnection) url.openConnection();
+                int statusCode = connection.getResponseCode();
+                if (statusCode == HttpURLConnection.HTTP_OK) {
+                    break;
+                } else if (statusCode == HttpURLConnection.HTTP_MOVED_TEMP ||
+                        statusCode == HttpURLConnection.HTTP_MOVED_PERM) {
+                    url = connection.getURL();
+                } else if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                    return R.string.download_no_found;
+                } else {
+                    return R.string.download_http_error;
+                }
+            }
+            if (connection == null)
                 return R.string.download_http_error;
-
             int fileLength = connection.getContentLength();
             int totalReceived = 0;
             inputStream = connection.getInputStream();
