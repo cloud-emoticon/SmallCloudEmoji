@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="pref_source_address_default">https://lab.sorz.org/static/dl/test.xml</string>
-</resources>
