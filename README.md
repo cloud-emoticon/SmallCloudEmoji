@@ -8,14 +8,14 @@ designed for Sony products.
 ## What's Cloud Emoticon
 
 [Cloud Emoticon](https://github.com/KTachibanaM/cloudemoji)
-is a universal Android app designed by
+is a cloud solution to your favorite emoticons designed by
 [KTachibanaM](https://github.com/KTachibanaM/).
-> A unique Android emoticon app that
+> This app
 > 
-> * reads in an emoticon repository on the cloud 
-> (e.g a Dropbox  public shared XML file)
-> * shows on categorized lists
-> * is capable of easy one-click copy && paste
+> * downloads emoticon repository from a server
+> * shows it on categorized lists
+> * is capable of one-click copy
+
 
 
 **Small Cloud Emoticon** implements most of its functions, 
