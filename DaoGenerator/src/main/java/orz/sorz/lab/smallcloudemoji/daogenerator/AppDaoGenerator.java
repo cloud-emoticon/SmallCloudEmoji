@@ -9,15 +9,14 @@ import de.greenrobot.daogenerator.ToMany;
 public class AppDaoGenerator {
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Schema(1, "org.sorz.lab.smallcloudemoji.models");
+        Schema schema = new Schema(1, "org.sorz.lab.smallcloudemoji.db");
 
-        addRepository(schema);
+        addEntities(schema);
 
         new DaoGenerator().generateAll(schema, "app/src-gen");
-
     }
 
-    private static void addRepository(Schema schema) {
+    private static void addEntities(Schema schema) {
         Entity repository = schema.addEntity("Repository");
         Property repositoryId = repository.addIdProperty().getProperty();
         repository.addStringProperty("url").notNull().unique();
