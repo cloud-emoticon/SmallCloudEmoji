@@ -1,1 +1,2 @@
+include ':DaoGenerator'
 include 'app'
