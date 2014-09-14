@@ -18,14 +18,15 @@ public class AppDaoGenerator {
 
     private static void addEntities(Schema schema) {
         Entity repository = schema.addEntity("Repository");
-        Property repositoryId = repository.addIdProperty().getProperty();
+        repository.addIdProperty();
         repository.addStringProperty("url").notNull().unique();
         repository.addStringProperty("alias");
         repository.addDateProperty("lastUpdateDate");
 
         Entity category = schema.addEntity("Category");
-        Property categoryId = category.addIdProperty().getProperty();
+        category.addIdProperty().getProperty();
         category.addStringProperty("name");
+        Property repositoryId = category.addLongProperty("repositoryId").getProperty();
         category.addToOne(repository, repositoryId);
 
         ToMany repositoryToCategories = repository.addToMany(category, repositoryId);
@@ -36,6 +37,7 @@ public class AppDaoGenerator {
         entry.addStringProperty("emoticon").notNull();
         entry.addStringProperty("description");
         entry.addDateProperty("lastUsed");
+        Property categoryId = entry.addLongProperty("categoryId").getProperty();
         entry.addToOne(category, categoryId);
 
         ToMany categoryToEntries = category.addToMany(entry, categoryId);
