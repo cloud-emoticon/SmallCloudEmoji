@@ -14,7 +14,11 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class RepositoryXmlLoader {
@@ -46,6 +50,7 @@ public class RepositoryXmlLoader {
 
         // Update updateDate after all, because it will be used to determine whether it is new one.
         repository.setLastUpdateDate(updateDate);
+        repository.update();
     }
 
 
@@ -62,7 +67,6 @@ public class RepositoryXmlLoader {
                 while (parser.next() != XmlPullParser.END_TAG ||
                         ! parser.getName().equals("infoos"))
                     ;
-                continue;
             } else if (tagName.equals("category")) {
                 loadCategory(parser, repository);
             }
@@ -91,22 +95,54 @@ public class RepositoryXmlLoader {
             category.setRepository(repository);
             categoryDao.insert(category);
         }
-        System.out.println(category.getId());
+
+        List<Entry> entries = new ArrayList<Entry>();
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             if (parser.getName().equals("entry")) {
-                loadEntry(parser, category);
+                entries.add(loadEntry(parser, category));
             }
         }
+        List<Entry> updateEntries = new ArrayList<Entry>();
+        List<Entry> insertEntries = new ArrayList<Entry>();
+        if (! category.getLastUpdateDate().equals(updateDate)) {
+            List<Entry> oldEntries = entryDao.queryBuilder()
+                    .where(EntryDao.Properties.CategoryId.eq(category.getId()))
+                    .list();
+            if (oldEntries.size() > 0) {
+                Map<String, Entry> oldEntryMap = new HashMap<String, Entry>(oldEntries.size());
+                for (Entry entry : oldEntries) {
+                    oldEntryMap.put(entry.getEmoticon(), entry);
+                }
+                for (Entry entry : entries) {
+                    Entry oldEntry = oldEntryMap.get(entry.getEmoticon());
+                    if (oldEntry != null) {
+                        oldEntry.setLastUpdateDate(updateDate);
+                        oldEntry.setDescription(entry.getDescription());
+                        updateEntries.add(oldEntry);
+                    } else {
+                        insertEntries.add(entry);
+                    }
+                }
+            } else {
+                insertEntries = entries;
+            }
+        } else {
+            insertEntries = entries;
+        }
+        entryDao.insertInTx(insertEntries);
+        entryDao.updateInTx(updateEntries);
 
-        // After all, set the updateDate.
-        category.setLastUpdateDate(updateDate);
+        if (! category.getLastUpdateDate().equals(updateDate)) {
+            category.setLastUpdateDate(updateDate);
+            category.update();
+        }
     }
 
 
-    private void loadEntry(XmlPullParser parser, Category category)
+    private Entry loadEntry(XmlPullParser parser, Category category)
             throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "entry");
         String emoticon = "";
@@ -122,24 +158,7 @@ public class RepositoryXmlLoader {
                 description = readNote(parser);
             }
         }
-        // Try to get entry from database first
-        // if the category which it belong to is not new added one.
-        if (! category.getLastUpdateDate().equals(updateDate)) {
-            Entry oldEntry = entryDao.queryBuilder()
-                    .where(EntryDao.Properties.CategoryId.eq(category.getId()),
-                            EntryDao.Properties.Emoticon.eq(emoticon))
-                    .unique();
-            if (oldEntry != null) {
-                oldEntry.setDescription(description);
-                oldEntry.setLastUpdateDate(updateDate);
-                return;
-            }
-        }
-        Date d1 = new Date();
-        Entry entry = new Entry(null, emoticon, description, null, updateDate, category.getId());
-        entryDao.insert(entry);
-        Date d2 = new Date();
-        System.out.println(d2.getTime() - d1.getTime());
+        return new Entry(null, emoticon, description, null, updateDate, category.getId());
     }
 
 
