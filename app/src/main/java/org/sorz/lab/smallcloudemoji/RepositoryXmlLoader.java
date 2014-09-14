@@ -19,34 +19,59 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 
 public class RepositoryXmlLoader {
     private static final String ns = null;
+    private DaoSession daoSession;
     private RepositoryDao repositoryDao;
     private CategoryDao categoryDao;
     private EntryDao entryDao;
     private Date updateDate;
 
     public RepositoryXmlLoader(DaoSession daoSession) {
+        this.daoSession = daoSession;
         repositoryDao = daoSession.getRepositoryDao();
         categoryDao = daoSession.getCategoryDao();
         entryDao = daoSession.getEntryDao();
     }
 
-    public void loadToDatabase(Repository repository, Reader xmlReader)
-            throws XmlPullParserException, IOException {
+    public void loadToDatabase(final Repository repository, Reader xmlReader)
+            throws Exception {
         updateDate = new Date();
         // Insert it into database only when the repository is new one, i.e. ID is null.
         if (repository.getId() == null) {
             repository.setLastUpdateDate(updateDate);
             repositoryDao.insert(repository);
         }
-        XmlPullParser parser = Xml.newPullParser();
+        final XmlPullParser parser = Xml.newPullParser();
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         parser.setInput(xmlReader);
         parser.nextTag();
-        loadRepository(repository, parser);
+
+        daoSession.callInTx(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                try {
+                    loadRepository(repository, parser);
+                } catch (Exception e) {
+                    // Delete all things if the repository is new one.
+                    // Otherwise keep all things to prevent lost usage information.
+                    if (repository.getLastUpdateDate().equals(updateDate)) {
+                        entryDao.queryBuilder()
+                                .where(EntryDao.Properties.LastUpdateDate.eq(updateDate))
+                                .buildDelete().executeDeleteWithoutDetachingEntities();
+                        categoryDao.queryBuilder()
+                                .where(CategoryDao.Properties.LastUpdateDate.eq(updateDate))
+                                .buildDelete().executeDeleteWithoutDetachingEntities();
+                        repository.delete();
+                    }
+                    throw e;
+                }
+                return null;
+            }
+        });
 
         // Update updateDate after all, because it will be used to determine whether it is new one.
         repository.setLastUpdateDate(updateDate);
