@@ -67,6 +67,15 @@ public class RepositoryXmlLoader {
                                 .buildDelete().executeDeleteWithoutDetachingEntities();
                         repository.delete();
                     }
+                    // Delete all outdated items.
+                    if (! repository.getLastUpdateDate().equals(updateDate)) {
+                        entryDao.queryBuilder()
+                                .where(EntryDao.Properties.LastUpdateDate.notEq(updateDate))
+                                .buildDelete().executeDeleteWithoutDetachingEntities();
+                        categoryDao.queryBuilder()
+                                .where(CategoryDao.Properties.LastUpdateDate.notEq(updateDate))
+                                .buildDelete().executeDeleteWithoutDetachingEntities();
+                    }
                     throw e;
                 }
                 return null;
