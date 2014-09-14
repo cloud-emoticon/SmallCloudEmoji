@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,9 +16,15 @@ import android.widget.Toast;
 import com.sony.smallapp.SmallAppWindow;
 import com.sony.smallapp.SmallApplication;
 
+import org.sorz.lab.smallcloudemoji.db.DaoMaster;
+import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -104,6 +111,22 @@ public class MainApplication extends SmallApplication {
                 return true;
             }
         });
+
+
+        // Test:
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "test", null);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
+        Repository repository = new Repository(null, "http://test/1", "test", null);
+
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(openFileInput("emojis.xml")));
+            new RepositoryXmlLoader(daoSession).loadToDatabase(repository, reader);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
