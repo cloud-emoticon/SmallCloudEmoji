@@ -18,28 +18,31 @@ public class AppDaoGenerator {
 
     private static void addEntities(Schema schema) {
         Entity repository = schema.addEntity("Repository");
-        repository.addIdProperty();
-        repository.addStringProperty("url").notNull().unique();
+        repository.addIdProperty().index();
+        repository.addStringProperty("url").notNull().unique().index();
         repository.addStringProperty("alias");
+        repository.addBooleanProperty("hidden").index();
+        repository.addIntProperty("order");
         repository.addDateProperty("lastUpdateDate");
 
         Entity category = schema.addEntity("Category");
-        category.addIdProperty().getProperty();
+        category.addIdProperty().index();
         category.addStringProperty("name");
-        category.addDateProperty("lastUpdateDate");
-        Property repositoryId = category.addLongProperty("repositoryId").getProperty();
+        category.addBooleanProperty("hidden").index();
+        category.addDateProperty("lastUpdateDate").index();
+        Property repositoryId = category.addLongProperty("repositoryId").index().getProperty();
         category.addToOne(repository, repositoryId);
 
         ToMany repositoryToCategories = repository.addToMany(category, repositoryId);
         repositoryToCategories.setName("categories");
 
         Entity entry = schema.addEntity("Entry");
-        entry.addIdProperty();
+        entry.addIdProperty().index();
         entry.addStringProperty("emoticon").notNull();
         entry.addStringProperty("description");
-        entry.addDateProperty("lastUsed");
-        entry.addDateProperty("lastUpdateDate");
-        Property categoryId = entry.addLongProperty("categoryId").getProperty();
+        entry.addDateProperty("lastUsed").indexDesc(null, false);
+        entry.addDateProperty("lastUpdateDate").index();
+        Property categoryId = entry.addLongProperty("categoryId").index().getProperty();
         entry.addToOne(category, categoryId);
 
         ToMany categoryToEntries = category.addToMany(entry, categoryId);

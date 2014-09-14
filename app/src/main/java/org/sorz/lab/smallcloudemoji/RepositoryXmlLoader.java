@@ -125,7 +125,7 @@ public class RepositoryXmlLoader {
                     .unique();
         }
         if (category == null) {
-            category = new Category(null, categoryName, updateDate, null);
+            category = new Category(null, categoryName, false, updateDate, null);
             category.setRepository(repository);
             categoryDao.insert(category);
         }
