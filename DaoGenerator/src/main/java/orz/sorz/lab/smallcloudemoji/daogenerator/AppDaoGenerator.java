@@ -26,6 +26,7 @@ public class AppDaoGenerator {
         Entity category = schema.addEntity("Category");
         category.addIdProperty().getProperty();
         category.addStringProperty("name");
+        category.addDateProperty("lastUpdateDate");
         Property repositoryId = category.addLongProperty("repositoryId").getProperty();
         category.addToOne(repository, repositoryId);
 
@@ -37,6 +38,7 @@ public class AppDaoGenerator {
         entry.addStringProperty("emoticon").notNull();
         entry.addStringProperty("description");
         entry.addDateProperty("lastUsed");
+        entry.addDateProperty("lastUpdateDate");
         Property categoryId = entry.addLongProperty("categoryId").getProperty();
         entry.addToOne(category, categoryId);
 
