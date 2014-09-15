@@ -40,13 +40,14 @@ public class AppDaoGenerator {
         entry.addIdProperty().index();
         entry.addStringProperty("emoticon").notNull();
         entry.addStringProperty("description");
-        entry.addDateProperty("lastUsed").indexDesc(null, false);
+        Property lastUsed = entry.addDateProperty("lastUsed").indexDesc(null, false).getProperty();
         entry.addDateProperty("lastUpdateDate").index();
         Property categoryId = entry.addLongProperty("categoryId").index().getProperty();
         entry.addToOne(category, categoryId);
 
         ToMany categoryToEntries = category.addToMany(entry, categoryId);
         categoryToEntries.setName("entries");
+        categoryToEntries.orderDesc(lastUsed);
     }
 
 }

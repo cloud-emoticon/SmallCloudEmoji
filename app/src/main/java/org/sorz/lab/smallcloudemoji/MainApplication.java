@@ -21,10 +21,7 @@ import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +34,8 @@ public class MainApplication extends SmallApplication {
     private HistoryDataSource historyDataSource;
     private List<EmoticonGroup> emoticonGroups;
     private BaseExpandableListAdapter adapter;
+    private DaoMaster daoMaster;
+    private DaoSession daoSession;
 
     @Override
     public void onCreate() {
@@ -54,10 +53,16 @@ public class MainApplication extends SmallApplication {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         historyDataSource = new HistoryDataSource(this);
 
+        // Open database.
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "repo.db", null);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        daoMaster = new DaoMaster(db);
+        daoSession = daoMaster.newSession();
+
         loadAllGroupsOrDownload();
         final ExpandableListView listView =
                 (ExpandableListView) findViewById(R.id.expandableListView);
-        adapter = new MainExpandableAdapter(this, emoticonGroups);
+        adapter = new MainExpandableAdapter(this, daoSession);
         listView.setAdapter(adapter);
         listView.expandGroup(0, false);
         listView.expandGroup(adapter.getGroupCount() - 1, false);
@@ -112,17 +117,13 @@ public class MainApplication extends SmallApplication {
             }
         });
 
-
         // Test:
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "test", null);
-        SQLiteDatabase db = helper.getWritableDatabase();
-        DaoMaster daoMaster = new DaoMaster(db);
-        DaoSession daoSession = daoMaster.newSession();
-        Repository repository = new Repository(null, "http://test/1", "test", null);
+        Repository repository = new Repository(null, "http://test/1", "test", false, 0, null);
+        //Repository repository = daoSession.getRepositoryDao().queryBuilder().unique();
 
         try {
-            Reader reader = new BufferedReader(new InputStreamReader(openFileInput("emojis.xml")));
-            new RepositoryXmlLoader(daoSession).loadToDatabase(repository, reader);
+            //Reader reader = new BufferedReader(new InputStreamReader(openFileInput("emojis.xml")));
+            //new RepositoryXmlLoader(daoSession).loadToDatabase(repository, reader);
         } catch (Exception e) {
             e.printStackTrace();
         }
