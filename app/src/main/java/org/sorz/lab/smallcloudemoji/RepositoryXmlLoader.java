@@ -1,3 +1,14 @@
+/* Copyright 2014 Sorz
+ * Licensed under the Apache License, Version 2.0
+ *
+ *
+ * This class is modified from
+ * https://github.com/KTachibanaM/cloudemoji/blob/master/CloudEmoji/src/main/
+ * java/org/ktachibana/cloudemoji/helpers/RepoXmlParser.java
+ *
+ * Copyright 2014 KTachibanaM for the original file
+ * Licensed under the Apache License, Version 2.0
+ */
 package org.sorz.lab.smallcloudemoji;
 
 import android.util.Xml;
