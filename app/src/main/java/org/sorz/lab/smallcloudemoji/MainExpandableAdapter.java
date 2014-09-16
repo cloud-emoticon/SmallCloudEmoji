@@ -138,7 +138,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
             String title = context.getResources().getString(R.string.list_title_setting);
             convertSettingsChildView(convertView, title);
         } else {
-            convertEmojiChildView(convertView,
+            convertEmoticonChildView(convertView,
                     categories.get(groupPosition).getEntries().get(childPosition));
         }
         return convertView;
@@ -164,7 +164,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         star.setVisibility(View.GONE);
     }
 
-    private void convertEmojiChildView(View itemView, Entry entry) {
+    private void convertEmoticonChildView(View itemView, Entry entry) {
         TextView text1 = (TextView) itemView.findViewById(R.id.text1);
         TextView text2 = (TextView) itemView.findViewById(R.id.text2);
         View star = itemView.findViewById(R.id.star);

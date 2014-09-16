@@ -40,12 +40,17 @@ public class RepositoryXmlLoader {
     private CategoryDao categoryDao;
     private EntryDao entryDao;
     private Date updateDate;
+    private RepositoryLoaderEventListener eventListener;
 
     public RepositoryXmlLoader(DaoSession daoSession) {
         this.daoSession = daoSession;
         repositoryDao = daoSession.getRepositoryDao();
         categoryDao = daoSession.getCategoryDao();
         entryDao = daoSession.getEntryDao();
+    }
+
+    public void setLoaderEventListener(RepositoryLoaderEventListener eventListener) {
+        this.eventListener = eventListener;
     }
 
     public void loadToDatabase(final Repository repository, Reader xmlReader)
@@ -100,7 +105,7 @@ public class RepositoryXmlLoader {
 
 
     private void loadRepository(Repository repository, XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+            throws XmlPullParserException, IOException, LoadingCancelException {
         parser.require(XmlPullParser.START_TAG, ns, "emoji");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -120,11 +125,9 @@ public class RepositoryXmlLoader {
 
 
     private void loadCategory(XmlPullParser parser, Repository repository)
-            throws XmlPullParserException, IOException {
+            throws XmlPullParserException, IOException, LoadingCancelException {
         parser.require(XmlPullParser.START_TAG, ns, "category");
         String categoryName = parser.getAttributeValue(null, "name");
-
-        System.out.println(categoryName);
 
         Category category = null;
         // Try to get category from database first
@@ -140,6 +143,9 @@ public class RepositoryXmlLoader {
             category.setRepository(repository);
             categoryDao.insert(category);
         }
+        if (eventListener != null)
+            if (eventListener.onLoadingCategory(category))
+                throw new LoadingCancelException();
 
         List<Entry> entries = new ArrayList<Entry>();
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -147,7 +153,11 @@ public class RepositoryXmlLoader {
                 continue;
             }
             if (parser.getName().equals("entry")) {
-                entries.add(loadEntry(parser, category));
+                Entry entry = loadEntry(parser, category);
+                entries.add(entry);
+                if (eventListener != null)
+                    if (eventListener.onEntryLoaded(entry))
+                        throw new LoadingCancelException();
             }
         }
         List<Entry> updateEntries = new ArrayList<Entry>();

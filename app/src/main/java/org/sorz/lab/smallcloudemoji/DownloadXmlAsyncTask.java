@@ -6,7 +6,11 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.google.common.io.CountingInputStream;
+
+import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 
 import java.io.BufferedReader;
@@ -16,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 
 /**
  * Download and save a XML file.
@@ -60,7 +65,7 @@ class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
 
         try {
             URL url = new URL(repository.getUrl());
-            for (int i=0; i<10; ++i) {  // Limit redirection (between HTTP and HTTPS) < 10 times.
+            for (int i = 0; i < 10; ++i) {  // Limit redirection (between HTTP and HTTPS) < 10 times.
                 connection = (HttpURLConnection) url.openConnection();
                 int statusCode = connection.getResponseCode();
                 if (statusCode == HttpURLConnection.HTTP_OK) {
@@ -76,16 +81,32 @@ class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
             }
             if (connection == null)
                 return R.string.download_http_error;
-            int fileLength = connection.getContentLength();
-            inputStream = connection.getInputStream();
+            final int fileLength = connection.getContentLength();
+            final CountingInputStream counting = new CountingInputStream(connection.getInputStream());
+            inputStream = counting;
 
             RepositoryXmlLoader xmlLoader = new RepositoryXmlLoader(daoSession);
+            xmlLoader.setLoaderEventListener(new RepositoryLoaderEventListener() {
+                private long lastUpdateProcess;
+
+                public boolean onLoadingCategory(Category category) {
+                    return isCancelled();
+                }
+
+                @Override
+                public boolean onEntryLoaded(Entry entry) {
+                    if (System.currentTimeMillis() - lastUpdateProcess >= 100) {
+                        int process = (int) counting.getCount() * 100 / fileLength;
+                        publishProgress(process);
+                        lastUpdateProcess = System.currentTimeMillis();
+                    }
+                    return isCancelled();
+                }
+            });
             xmlLoader.loadToDatabase(repository,
                     new BufferedReader(new InputStreamReader(inputStream)));
-
-            // TODO: publishProgress()
-            // TODO: isCancelled()
-
+        } catch (LoadingCancelException e) {
+            return CANCELLED;
         } catch (MalformedURLException e) {
             return R.string.download_malformed_url;
         } catch (IOException e) {
