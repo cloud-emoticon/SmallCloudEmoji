@@ -74,7 +74,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        return categories.size() + 1;  // Add one item, Settings.
+        return categories.size();
     }
 
     @Override
@@ -113,13 +113,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
-        String title;
-        if (groupPosition == categories.size()) // == Settings
-            title = context.getResources().getString(R.string.list_title_options);
-        else if (groupPosition == 0)  // == Favorites
-            title = context.getResources().getString(R.string.list_title_favorite);
-        else
-            title = getGroup(groupPosition).getName();
+        String title = getGroup(groupPosition).getName();
         if (convertView != null && convertView instanceof TextView) {
             ((TextView) convertView).setText(title);
             return convertView;
@@ -133,14 +127,8 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
                              View convertView, ViewGroup parent) {
         if (convertView == null || convertView instanceof RelativeLayout)
             convertView = inflater.inflate(R.layout.item_child, parent, false);
-
-        if (groupPosition == categories.size()) {  // == Settings
-            String title = context.getResources().getString(R.string.list_title_setting);
-            convertSettingsChildView(convertView, title);
-        } else {
-            convertEmoticonChildView(convertView,
-                    categories.get(groupPosition).getEntries().get(childPosition));
-        }
+        convertChildView(convertView,
+                categories.get(groupPosition).getEntries().get(childPosition));
         return convertView;
     }
 
@@ -155,16 +143,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         return textView;
     }
 
-    private void convertSettingsChildView(View itemView, String title) {
-        TextView text1 = (TextView) itemView.findViewById(R.id.text1);
-        TextView text2 = (TextView) itemView.findViewById(R.id.text2);
-        View star = itemView.findViewById(R.id.star);
-        text1.setText(title);
-        text2.setVisibility(View.GONE);
-        star.setVisibility(View.GONE);
-    }
-
-    private void convertEmoticonChildView(View itemView, Entry entry) {
+    private void convertChildView(View itemView, Entry entry) {
         TextView text1 = (TextView) itemView.findViewById(R.id.text1);
         TextView text2 = (TextView) itemView.findViewById(R.id.text2);
         View star = itemView.findViewById(R.id.star);

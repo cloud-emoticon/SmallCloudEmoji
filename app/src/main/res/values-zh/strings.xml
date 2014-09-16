@@ -14,7 +14,6 @@
     <string name="download_unknown_error">下载时出现奇怪问题了喵</string>
     <string name="list_title_favorite">我的收藏</string>
     <string name="list_title_options">选项</string>
-    <string name="list_title_setting">修改设置</string>
     <string name="pref_about_title">关于</string>
     <string name="pref_after_copied_dialog_title">选择一个动作</string>
     <string name="pref_after_copied_title">复制后…</string>
