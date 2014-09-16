@@ -12,6 +12,7 @@ import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -110,11 +111,12 @@ class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
         } catch (MalformedURLException e) {
             return R.string.download_malformed_url;
         } catch (IOException e) {
-            e.printStackTrace();
             return R.string.download_io_exception;
+        } catch (XmlPullParserException e) {
+            return R.string.download_file_parser_error;
         } catch (Exception e) {
-            e.printStackTrace();  // TODO
-            return R.string.download_io_exception;
+            e.printStackTrace();
+            return R.string.download_unknown_error;
         } finally {
             try {
                 if (inputStream != null)
