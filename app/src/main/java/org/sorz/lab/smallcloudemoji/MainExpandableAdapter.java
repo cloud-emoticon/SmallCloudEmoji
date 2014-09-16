@@ -11,9 +11,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.sorz.lab.smallcloudemoji.db.Category;
-import org.sorz.lab.smallcloudemoji.db.CategoryDao;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;
+import org.sorz.lab.smallcloudemoji.db.FavoriteCategory;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
 
@@ -40,17 +40,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         showNote = preferences.getBoolean("show_note", true);
 
         // Load favorites.
-        CategoryDao categoryDao = daoSession.getCategoryDao();
-        Category favorites = categoryDao.queryBuilder()
-                .where(CategoryDao.Properties.Name.eq("(Favorites)"),
-                        CategoryDao.Properties.RepositoryId.isNull())
-                .unique();
-        if (favorites == null) {
-            // Create favorites.
-            favorites = new Category(null, "(Favorites)", true, null, null);
-            categoryDao.insert(favorites);
-        }
-        categories.add(favorites);
+        categories.add(new FavoriteCategory(context, daoSession));
 
         // Load all categories.
         RepositoryDao repositoryDao = daoSession.getRepositoryDao();
@@ -60,6 +50,13 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
                 .list();
         for (Repository repository : repositories)
             categories.addAll(repository.getCategories());
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        // Reset favorites.
+        categories.get(0).resetEntries();
+        super.notifyDataSetChanged();
     }
 
     @Override
@@ -170,8 +167,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         } else {
             text2.setVisibility(View.GONE);
         }
-        // TODO: show the star
-        //star.setVisibility(emoticon.hasStar() ? View.VISIBLE : View.GONE);
+        star.setVisibility(entry.getStar() ? View.VISIBLE : View.GONE);
         itemView.setTag(entry);
     }
 

@@ -192,7 +192,7 @@ public class RepositoryXmlLoader {
                 description = readNote(parser);
             }
         }
-        return new Entry(null, emoticon, description, null, updateDate, category.getId());
+        return new Entry(null, emoticon, description, false, null, updateDate, category.getId());
     }
 
 

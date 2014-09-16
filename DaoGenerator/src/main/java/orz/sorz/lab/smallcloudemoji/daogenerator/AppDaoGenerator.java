@@ -40,6 +40,7 @@ public class AppDaoGenerator {
         entry.addIdProperty().index();
         entry.addStringProperty("emoticon").notNull();
         entry.addStringProperty("description");
+        entry.addBooleanProperty("star").index();
         Property lastUsed = entry.addDateProperty("lastUsed").indexDesc(null, false).getProperty();
         entry.addDateProperty("lastUpdateDate").index();
         Property categoryId = entry.addLongProperty("categoryId").index().getProperty();
