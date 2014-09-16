@@ -6,11 +6,13 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.Repository;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,17 +20,17 @@ import java.net.URL;
 /**
  * Download and save a XML file.
  */
-class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
+class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
     private Context context;
+    private DaoSession daoSession;
     private ProgressDialog progressDialog;
-    private File targetFile;
-    private File temporaryFile;
 
     private static final int CANCELLED = -1;
 
-    public DownloadXmlAsyncTask(Context context) {
+    public DownloadXmlAsyncTask(Context context, DaoSession daoSession) {
         super();
         this.context = context;
+        this.daoSession = daoSession;
     }
 
     @Override
@@ -51,16 +53,13 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
     }
 
     @Override
-    protected Integer doInBackground(String... params) {
-        targetFile = new File(context.getFilesDir(), params[1]);
-        temporaryFile = new File(context.getFilesDir(), params[1] + ".tmp");
-
+    protected Integer doInBackground(Repository... params) {
         InputStream inputStream = null;
-        OutputStream outputStream = null;
         HttpURLConnection connection = null;
+        Repository repository = params[0];
 
         try {
-            URL url = new URL(params[0]);
+            URL url = new URL(repository.getUrl());
             for (int i=0; i<10; ++i) {  // Limit redirection (between HTTP and HTTPS) < 10 times.
                 connection = (HttpURLConnection) url.openConnection();
                 int statusCode = connection.getResponseCode();
@@ -78,32 +77,27 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
             if (connection == null)
                 return R.string.download_http_error;
             int fileLength = connection.getContentLength();
-            int totalReceived = 0;
             inputStream = connection.getInputStream();
-            outputStream = new FileOutputStream(temporaryFile);
 
-            byte buffer[] = new byte[4096];
-            int received;
-            while ((received = inputStream.read(buffer)) != -1) {
-                totalReceived += received;
-                if (fileLength > 0)
-                    publishProgress((int) 100.0 * totalReceived / fileLength);
-                outputStream.write(buffer, 0, received);
+            RepositoryXmlLoader xmlLoader = new RepositoryXmlLoader(daoSession);
+            xmlLoader.loadToDatabase(repository,
+                    new BufferedReader(new InputStreamReader(inputStream)));
 
-                if (isCancelled())
-                    return CANCELLED;
-            }
+            // TODO: publishProgress()
+            // TODO: isCancelled()
 
         } catch (MalformedURLException e) {
             return R.string.download_malformed_url;
         } catch (IOException e) {
+            e.printStackTrace();
+            return R.string.download_io_exception;
+        } catch (Exception e) {
+            e.printStackTrace();  // TODO
             return R.string.download_io_exception;
         } finally {
             try {
                 if (inputStream != null)
                     inputStream.close();
-                if (outputStream != null)
-                    outputStream.close();
             } catch (IOException e) {
                 // Ignore it
             }
@@ -125,18 +119,12 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
     protected void onPostExecute(Integer result) {
         progressDialog.dismiss();
         if (R.string.download_success == result) {
-            targetFile.delete();
-            if (! temporaryFile.renameTo(targetFile.getAbsoluteFile()))
-                Toast.makeText(context, R.string.download_file_operation_error,
-                        Toast.LENGTH_SHORT).show();
-            else
                 Toast.makeText(context, R.string.download_success, Toast.LENGTH_SHORT).show();
         } else {
             String message = String.format(
                     context.getString(R.string.download_fail),
                     context.getString(result));
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            temporaryFile.delete();
         }
     }
 
@@ -146,7 +134,6 @@ class DownloadXmlAsyncTask extends AsyncTask<String, Integer, Integer> {
             onPostExecute(result);
         } else {
             progressDialog.dismiss();
-            temporaryFile.delete();
         }
     }
 }

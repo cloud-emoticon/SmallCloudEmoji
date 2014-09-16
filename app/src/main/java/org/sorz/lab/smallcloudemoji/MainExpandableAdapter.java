@@ -29,19 +29,26 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     final private LayoutInflater inflater;
 
     private boolean showNote;
+    private DaoSession daoSession;
     private List<Category> categories = new ArrayList<Category>();
 
     public MainExpandableAdapter(Context context, DaoSession daoSession) {
         super();
         this.context = context;
+        this.daoSession = daoSession;
         inflater = LayoutInflater.from(context);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         showNote = preferences.getBoolean("show_note", true);
 
+        reloadCategories();
+
+    }
+
+    private void reloadCategories() {
+        categories.clear();
         // Load favorites.
         categories.add(new FavoriteCategory(context, daoSession));
-
         // Load all categories.
         RepositoryDao repositoryDao = daoSession.getRepositoryDao();
         List<Repository> repositories = repositoryDao.queryBuilder()
@@ -50,6 +57,12 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
                 .list();
         for (Repository repository : repositories)
             categories.addAll(repository.getCategories());
+    }
+
+    public void notifyDataSetChanged(boolean reloadAllCategories) {
+        if (reloadAllCategories)
+            reloadCategories();
+        notifyDataSetChanged();
     }
 
     @Override
