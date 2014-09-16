@@ -46,7 +46,7 @@ public class DatabaseUpgrader {
                 }
         }
         repository.resetCategories();
-        xmlFile.deleteOnExit();
+        xmlFile.delete();
 
         File databaseFile = context.getDatabasePath("emoji.db");
         SQLiteDatabase sqLiteDatabase = null;
@@ -73,7 +73,7 @@ public class DatabaseUpgrader {
                 if (sqLiteDatabase != null)
                     sqLiteDatabase.close();
             }
-            databaseFile.deleteOnExit();
+            databaseFile.delete();
         }
 
     }
