@@ -42,15 +42,6 @@ public class SettingsFragment extends PreferenceFragment {
         daoSession = databaseOpenHelper.getDaoSession();
         repository = databaseOpenHelper.getDefaultRepository();
 
-        // Favorites number: show value as summary.
-        // TODO: delete the function?
-        final EditTextPreference favoritesCountPreference =
-                (EditTextPreference) findPreference("favorites_count");
-        final String favoritesCountPreferenceSummary =
-                getResources().getString(R.string.pref_favorites_count_summary);
-        favoritesCountPreference.setSummary(String.format(favoritesCountPreferenceSummary,
-                favoritesCountPreference.getText()));
-
         // Usage history clean
         Preference historyCleanPreference = findPreference("history_clean");
         historyCleanPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -115,10 +106,6 @@ public class SettingsFragment extends PreferenceFragment {
                     sourceUrlPreference.setSummary(newUrl);
                     repository.setUrl(newUrl);
                     repository.update();
-                } else if (key.equals("favorites_count")) {
-                    favoritesCountPreference.setSummary(
-                            String.format(favoritesCountPreferenceSummary,
-                                    favoritesCountPreference.getText()));
                 }
             }
         });

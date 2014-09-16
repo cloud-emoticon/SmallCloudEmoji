@@ -74,13 +74,11 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        System.out.println("getGroupCount");
         return categories.size() + 1;  // Add one item, Settings.
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        System.out.println("getChildrenCount " + groupPosition);
         if (groupPosition == categories.size())  // == Settings group
             return 1;
         else
@@ -89,13 +87,11 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Category getGroup(int groupPosition) {
-        System.out.println("getGroup " + groupPosition);
         return categories.get(groupPosition);
     }
 
     @Override
     public Entry getChild(int groupPosition, int childPosition) {
-        System.out.println("getChild " + groupPosition + "" + childPosition);
         return categories.get(groupPosition).getEntries().get(childPosition);
     }
 

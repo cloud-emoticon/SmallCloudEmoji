@@ -22,8 +22,6 @@
     <string name="pref_ui_title">UI</string>
     <string name="pref_show_note_title">Show note below emoticon</string>
     <string name="pref_favorites_title">Favorites</string>
-    <string name="pref_favorites_count_title">Favorites shown</string>
-    <string name="pref_favorites_count_summary">max %s items</string>
     <string name="pref_history_clean_title">Clean usage history</string>
     <string name="pref_history_clean_done">Usage history has gone.</string>
     <string name="pref_star_clean_title">Unset all stars</string>
