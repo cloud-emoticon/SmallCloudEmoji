@@ -13,6 +13,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import org.sorz.lab.smallcloudemoji.db.DaoMaster;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
@@ -28,6 +29,7 @@ import java.util.List;
  */
 public class SettingsFragment extends PreferenceFragment {
     private Context context;
+    private DaoMaster daoMaster;
     private DaoSession daoSession;
     private Repository repository;
 
@@ -40,6 +42,7 @@ public class SettingsFragment extends PreferenceFragment {
 
         // Open database.
         DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(context);
+        daoMaster = databaseOpenHelper.getDaoMaster();
         daoSession = databaseOpenHelper.getDaoSession();
         DatabaseUpgrader.checkAndDoUpgrade(context, daoSession);
         repository = databaseOpenHelper.getDefaultRepository();
@@ -149,6 +152,12 @@ public class SettingsFragment extends PreferenceFragment {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        daoMaster.getDatabase().close();
     }
 
 }

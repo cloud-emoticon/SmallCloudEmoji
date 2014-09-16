@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 
+import org.sorz.lab.smallcloudemoji.db.DaoMaster;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
 import org.sorz.lab.smallcloudemoji.db.Repository;
@@ -39,6 +40,7 @@ public class ViewNewSourceActivity extends Activity {
 
         DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(this);
         DaoSession daoSession = databaseOpenHelper.getDaoSession();
+        final DaoMaster daoMaster = databaseOpenHelper.getDaoMaster();
         final Repository repository = databaseOpenHelper.getDefaultRepository();
 
         final String oldUrl = repository.getUrl();
@@ -52,10 +54,12 @@ public class ViewNewSourceActivity extends Activity {
                     editor.putString("source_address", newSourceUrl);
                     editor.commit();
                     repository.update();
+                    daoMaster.getDatabase().close();
                     finish();
                 } else {
                     repository.setUrl(oldUrl);
                     repository.update();
+                    daoMaster.getDatabase().close();
                 }
             }
         }.execute(repository);

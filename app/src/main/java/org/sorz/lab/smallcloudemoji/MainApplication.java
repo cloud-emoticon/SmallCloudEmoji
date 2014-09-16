@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.sony.smallapp.SmallAppWindow;
 import com.sony.smallapp.SmallApplication;
 
+import org.sorz.lab.smallcloudemoji.db.DaoMaster;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
@@ -30,6 +31,7 @@ import java.util.Date;
 public class MainApplication extends SmallApplication {
     private SharedPreferences sharedPreferences;
     private MainExpandableAdapter adapter;
+    private DaoMaster daoMaster;
     private DaoSession daoSession;
 
     @Override
@@ -50,6 +52,7 @@ public class MainApplication extends SmallApplication {
         // Open database.
         DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(this);
         daoSession = databaseOpenHelper.getDaoSession();
+        daoMaster = databaseOpenHelper.getDaoMaster();
         DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
         final Repository repository = databaseOpenHelper.getDefaultRepository();
 
@@ -144,6 +147,7 @@ public class MainApplication extends SmallApplication {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        daoMaster.getDatabase().close();
     }
 
 }
