@@ -25,7 +25,7 @@ public class DatabaseOpenHelper {
 
         defaultRepository = daoSession.getRepositoryDao().queryBuilder()
                 .where(RepositoryDao.Properties.Alias.eq("Default"))
-                .unique();
+                .limit(1).unique();
         if (defaultRepository == null) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             String sourceUrl = preferences.getString("sync_source",

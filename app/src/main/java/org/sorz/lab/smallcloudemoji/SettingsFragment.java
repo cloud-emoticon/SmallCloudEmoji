@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
+import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
@@ -40,6 +41,7 @@ public class SettingsFragment extends PreferenceFragment {
         // Open database.
         DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(context);
         daoSession = databaseOpenHelper.getDaoSession();
+        DatabaseUpgrader.checkAndDoUpgrade(context, daoSession);
         repository = databaseOpenHelper.getDefaultRepository();
 
         // Usage history clean

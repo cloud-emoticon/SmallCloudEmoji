@@ -16,6 +16,7 @@ import com.sony.smallapp.SmallApplication;
 
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
+import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 
@@ -47,7 +48,9 @@ public class MainApplication extends SmallApplication {
         // Open database.
         DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(this);
         daoSession = databaseOpenHelper.getDaoSession();
+        DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
         final Repository repository = databaseOpenHelper.getDefaultRepository();
+
 
         // Download if empty.
         if (repository.getCategories().isEmpty()) {
