@@ -6,8 +6,10 @@ import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
@@ -52,7 +54,7 @@ public class MainApplication extends SmallApplication {
         final Repository repository = databaseOpenHelper.getDefaultRepository();
 
 
-        // Download if empty.
+        // Download if it's empty.
         if (repository.getCategories().isEmpty()) {
             // Minimize the windows rather than mask the process dialog.
             getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
@@ -70,38 +72,45 @@ public class MainApplication extends SmallApplication {
 
         final ExpandableListView listView =
                 (ExpandableListView) findViewById(R.id.expandableListView);
+
+        // Add options button.
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View bottom = inflater.inflate(R.layout.item_options, null);
+        Button button = (Button) bottom.findViewById(R.id.options_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainApplication.this, SettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
+        listView.addFooterView(bottom);
+
         adapter = new MainExpandableAdapter(this, daoSession);
         listView.setAdapter(adapter);
         listView.expandGroup(0, false);
-        listView.expandGroup(adapter.getGroupCount() - 1, false);
 
         listView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                         int childPosition, long id) {
-                Object tag = v.getTag();
-                if (tag instanceof Entry) {
-                    Entry entry = (Entry) tag;
-                    ClipboardManager clipboard =
-                            (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clipData = ClipData.newPlainText("emoticon", entry.getEmoticon());
-                    clipboard.setPrimaryClip(clipData);
-                    Toast.makeText(MainApplication.this, R.string.toast_copied,
-                            Toast.LENGTH_SHORT).show();
-                    entry.setLastUsed(new Date());
-                    entry.update();
+                Entry entry = (Entry) v.getTag();
+                ClipboardManager clipboard =
+                        (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("emoticon", entry.getEmoticon());
+                clipboard.setPrimaryClip(clipData);
+                Toast.makeText(MainApplication.this, R.string.toast_copied,
+                        Toast.LENGTH_SHORT).show();
+                entry.setLastUsed(new Date());
+                entry.update();
 
-                    String action = sharedPreferences.getString("action_after_copied", "MINIMIZE");
-                    if (action.equals("MINIMIZE"))
-                        getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
-                    else if (action.equals("CLOSE"))
-                        finish();
-                } else {  // is the settings item.
-                    Intent intent = new Intent(MainApplication.this, SettingsActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                String action = sharedPreferences.getString("action_after_copied", "MINIMIZE");
+                if (action.equals("MINIMIZE"))
+                    getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
+                else if (action.equals("CLOSE"))
                     finish();
-                }
                 return true;
             }
         });

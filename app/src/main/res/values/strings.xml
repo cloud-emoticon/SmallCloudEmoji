@@ -4,7 +4,6 @@
     <string name="app_name">Small Cloud Emoticon</string>
     <string name="action_close">Close</string>
     <string name="list_title_favorite">Favorites</string>
-    <string name="list_title_setting">Show Settings</string>
     <string name="list_title_options">Options</string>
     <string name="toast_copied">Emoticon copied</string>
     <string name="download_title">Downloading</string>
