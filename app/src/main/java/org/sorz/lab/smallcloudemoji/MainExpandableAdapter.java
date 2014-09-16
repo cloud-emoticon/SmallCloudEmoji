@@ -10,6 +10,14 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.sorz.lab.smallcloudemoji.db.Category;
+import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.Entry;
+import org.sorz.lab.smallcloudemoji.db.FavoriteCategory;
+import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,55 +28,71 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     final private Context context;
     final private LayoutInflater inflater;
 
-    private List<EmoticonGroup> emoticonGroups;
     private boolean showNote;
+    private DaoSession daoSession;
+    private List<Category> categories = new ArrayList<Category>();
 
-
-    public MainExpandableAdapter(Context context, List<EmoticonGroup> emoticonGroups) {
+    public MainExpandableAdapter(Context context, DaoSession daoSession) {
         super();
         this.context = context;
-        this.emoticonGroups = emoticonGroups;
+        this.daoSession = daoSession;
         inflater = LayoutInflater.from(context);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         showNote = preferences.getBoolean("show_note", true);
+
+        reloadCategories();
+
+    }
+
+    private void reloadCategories() {
+        categories.clear();
+        // Load favorites.
+        categories.add(new FavoriteCategory(context, daoSession));
+        // Load all categories.
+        RepositoryDao repositoryDao = daoSession.getRepositoryDao();
+        List<Repository> repositories = repositoryDao.queryBuilder()
+                .where(RepositoryDao.Properties.Hidden.eq(false))
+                .orderAsc(RepositoryDao.Properties.Order)
+                .list();
+        for (Repository repository : repositories)
+            categories.addAll(repository.getCategories());
+    }
+
+    public void notifyDataSetChanged(boolean reloadAllCategories) {
+        if (reloadAllCategories)
+            reloadCategories();
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        // Reset favorites.
+        categories.get(0).resetEntries();
+        super.notifyDataSetChanged();
     }
 
     @Override
     public int getGroupCount() {
-        return emoticonGroups.size() + 1;  // Add one item, Settings.
+        return categories.size() + 1;  // Add one item, Settings.
     }
 
     @Override
-    public int getChildrenCount(int i) {
-        if (i == emoticonGroups.size())
+    public int getChildrenCount(int groupPosition) {
+        if (groupPosition == categories.size())  // == Settings group
             return 1;
-        return emoticonGroups.get(i).size();
+        else
+            return categories.get(groupPosition).getEntries().size();
     }
 
     @Override
-    public EmoticonGroup getGroup(int groupPosition) {
-        if (groupPosition >= emoticonGroups.size())
-            return null;
-        return emoticonGroups.get(groupPosition);
+    public Category getGroup(int groupPosition) {
+        return categories.get(groupPosition);
     }
 
     @Override
-    public Emoticon getChild(int groupPosition, int childPosition) {
-        List<Emoticon> group = getGroup(groupPosition);
-        if (group == null)
-            return null;
-        Emoticon emoticon = group.get(childPosition);
-
-        // Due to the star which is only tagged in favorites group.
-        // Check and use it if which is also in favorites group.
-        if (groupPosition != 0) { // != favorites group
-            EmoticonGroup favorites = getGroup(0);
-            int index = favorites.indexOf(emoticon);
-            if (index != -1)
-                emoticon = favorites.get(index);
-        }
-        return emoticon;
+    public Entry getChild(int groupPosition, int childPosition) {
+        return categories.get(groupPosition).getEntries().get(childPosition);
     }
 
     @Override
@@ -90,10 +114,12 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
         String title;
-        if (groupPosition == emoticonGroups.size())
+        if (groupPosition == categories.size()) // == Settings
             title = context.getResources().getString(R.string.list_title_options);
+        else if (groupPosition == 0)  // == Favorites
+            title = context.getResources().getString(R.string.list_title_favorite);
         else
-            title = emoticonGroups.get(groupPosition).toString();
+            title = getGroup(groupPosition).getName();
         if (convertView != null && convertView instanceof TextView) {
             ((TextView) convertView).setText(title);
             return convertView;
@@ -108,12 +134,12 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         if (convertView == null || convertView instanceof RelativeLayout)
             convertView = inflater.inflate(R.layout.item_child, parent, false);
 
-        if (groupPosition == emoticonGroups.size()) {
+        if (groupPosition == categories.size()) {  // == Settings
             String title = context.getResources().getString(R.string.list_title_setting);
             convertSettingsChildView(convertView, title);
         } else {
-            Emoticon emoticon = getChild(groupPosition, childPosition);
-            convertEmojiChildView(convertView, emoticon);
+            convertEmoticonChildView(convertView,
+                    categories.get(groupPosition).getEntries().get(childPosition));
         }
         return convertView;
     }
@@ -138,20 +164,20 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         star.setVisibility(View.GONE);
     }
 
-    private void convertEmojiChildView(View itemView, Emoticon emoticon) {
+    private void convertEmoticonChildView(View itemView, Entry entry) {
         TextView text1 = (TextView) itemView.findViewById(R.id.text1);
         TextView text2 = (TextView) itemView.findViewById(R.id.text2);
         View star = itemView.findViewById(R.id.star);
 
-        text1.setText(emoticon.toString());
-        if (showNote && ! emoticon.getNote().isEmpty()) {
-            text2.setText(emoticon.getNote());
+        text1.setText(entry.getEmoticon());
+        if (showNote && ! entry.getDescription().isEmpty()) {
+            text2.setText(entry.getDescription());
             text2.setVisibility(View.VISIBLE);
         } else {
             text2.setVisibility(View.GONE);
         }
-        star.setVisibility(emoticon.hasStar() ? View.VISIBLE : View.GONE);
-        itemView.setTag(emoticon);
+        star.setVisibility(entry.getStar() ? View.VISIBLE : View.GONE);
+        itemView.setTag(entry);
     }
 
 }

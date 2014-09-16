@@ -21,12 +21,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/list_title_favorite">
-        <EditTextPreference
-            android:key="favorites_count"
-            android:title="@string/pref_favorites_count_title"
-            android:numeric="integer"
-            android:maxLength="2"
-            android:defaultValue="8" />
         <Preference
             android:key="history_clean"
             android:title="@string/pref_history_clean_title" />

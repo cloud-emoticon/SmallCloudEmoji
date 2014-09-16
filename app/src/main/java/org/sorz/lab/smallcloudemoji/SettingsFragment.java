@@ -13,12 +13,23 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
+import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
+import org.sorz.lab.smallcloudemoji.db.Entry;
+import org.sorz.lab.smallcloudemoji.db.EntryDao;
+import org.sorz.lab.smallcloudemoji.db.Repository;
+
+import java.util.List;
+
 /**
  * Show all settings. Shown inside SettingsActivity.
  * Include source sync (downloading XML).
  */
 public class SettingsFragment extends PreferenceFragment {
     private Context context;
+    private DaoSession daoSession;
+    private Repository repository;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,21 +38,25 @@ public class SettingsFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.preferences);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        // Favorites number: show value as summary.
-        final EditTextPreference favoritesCountPreference =
-                (EditTextPreference) findPreference("favorites_count");
-        final String favoritesCountPreferenceSummary =
-                getResources().getString(R.string.pref_favorites_count_summary);
-        favoritesCountPreference.setSummary(String.format(favoritesCountPreferenceSummary,
-                favoritesCountPreference.getText()));
+        // Open database.
+        DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(context);
+        daoSession = databaseOpenHelper.getDaoSession();
+        DatabaseUpgrader.checkAndDoUpgrade(context, daoSession);
+        repository = databaseOpenHelper.getDefaultRepository();
 
         // Usage history clean
         Preference historyCleanPreference = findPreference("history_clean");
         historyCleanPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                HistoryDataSource historyDataSource = new HistoryDataSource(context);
-                historyDataSource.cleanHistory();
+                EntryDao entryDao = daoSession.getEntryDao();
+                List<Entry> entries = entryDao.queryBuilder()
+                        .where(EntryDao.Properties.LastUsed.isNotNull())
+                        .list();
+                for (Entry entry : entries) {
+                    entry.setLastUsed(null);
+                }
+                entryDao.updateInTx(entries);
                 Toast.makeText(context, R.string.pref_history_clean_done,
                         Toast.LENGTH_SHORT).show();
                 return true;
@@ -61,8 +76,14 @@ public class SettingsFragment extends PreferenceFragment {
                         new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        HistoryDataSource historyDataSource = new HistoryDataSource(context);
-                        historyDataSource.cleanAllStars();
+                        EntryDao entryDao = daoSession.getEntryDao();
+                        List<Entry> entries = entryDao.queryBuilder()
+                                .where(EntryDao.Properties.Star.eq(true))
+                                .list();
+                        for (Entry entry : entries) {
+                            entry.setStar(false);
+                        }
+                        entryDao.updateInTx(entries);
                         Toast.makeText(context, R.string.pref_star_clean_done,
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -75,18 +96,19 @@ public class SettingsFragment extends PreferenceFragment {
         // Source address preference: show value as summary.
         final EditTextPreference sourceUrlPreference =
                 (EditTextPreference) findPreference("source_address");
-        sourceUrlPreference.setSummary(sourceUrlPreference.getText());
+        sourceUrlPreference.setSummary(repository.getUrl());
+        sourceUrlPreference.setText(repository.getUrl());
 
         // Update summaries
         preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals("source_address"))
-                    sourceUrlPreference.setSummary(sourceUrlPreference.getText());
-                else if (key.equals("favorites_count"))
-                    favoritesCountPreference.setSummary(
-                            String.format(favoritesCountPreferenceSummary,
-                                    favoritesCountPreference.getText()));
+                if (key.equals("source_address")) {
+                    String newUrl = sourceUrlPreference.getText();
+                    sourceUrlPreference.setSummary(newUrl);
+                    repository.setUrl(newUrl);
+                    repository.update();
+                }
             }
         });
 
@@ -97,6 +119,9 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceClick(Preference preference) {
                 String defaultSourceUrl = context.getString(R.string.pref_source_address_default);
                 sourceUrlPreference.setText(defaultSourceUrl);
+                sourceUrlPreference.setSummary(defaultSourceUrl);
+                repository.setUrl(defaultSourceUrl);
+                repository.update();
                 Toast.makeText(context, R.string.pref_restore_source_done,
                         Toast.LENGTH_SHORT).show();
                 return true;
@@ -108,8 +133,7 @@ public class SettingsFragment extends PreferenceFragment {
         syncSourcePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new DownloadXmlAsyncTask(context).execute(sourceUrlPreference.getText(),
-                        "emojis.xml");
+                new DownloadXmlAsyncTask(context, daoSession).execute(repository);
                 return false;
             }
         });

@@ -15,15 +15,14 @@
     <string name="download_io_exception">Cannot connect to source server.</string>
     <string name="download_no_found">File no found (404).</string>
     <string name="download_http_error">HTTP error.</string>
-    <string name="download_file_operation_error">Something go wrong when writing files.</string>
+    <string name="download_file_parser_error">Some wrong in file.</string>
+    <string name="download_unknown_error">Something go wrong during downloading.</string>
     <string name="pref_behaviors_title">Behaviors</string>
     <string name="pref_after_copied_title">After copied</string>
     <string name="pref_after_copied_dialog_title">Select one action</string>
     <string name="pref_ui_title">UI</string>
     <string name="pref_show_note_title">Show note below emoticon</string>
     <string name="pref_favorites_title">Favorites</string>
-    <string name="pref_favorites_count_title">Favorites shown</string>
-    <string name="pref_favorites_count_summary">max %s items</string>
     <string name="pref_history_clean_title">Clean usage history</string>
     <string name="pref_history_clean_done">Usage history has gone.</string>
     <string name="pref_star_clean_title">Unset all stars</string>
