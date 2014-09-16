@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 
+import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
+import org.sorz.lab.smallcloudemoji.db.Repository;
+
 
 public class ViewNewSourceActivity extends Activity {
     String newSourceUrl;
@@ -33,17 +37,28 @@ public class ViewNewSourceActivity extends Activity {
                 PreferenceManager.getDefaultSharedPreferences(ViewNewSourceActivity.this);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        new DownloadXmlAsyncTask(this) {
+        DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(this);
+        DaoSession daoSession = databaseOpenHelper.getDaoSession();
+        final Repository repository = databaseOpenHelper.getDefaultRepository();
+
+        final String oldUrl = repository.getUrl();
+        repository.setUrl(newSourceUrl);
+
+        new DownloadXmlAsyncTask(this, daoSession) {
             @Override
             protected void onPostExecute(Integer result) {
                 super.onPostExecute(result);
                 if (R.string.download_success == result) {
                     editor.putString("source_address", newSourceUrl);
                     editor.commit();
+                    repository.update();
                     finish();
+                } else {
+                    repository.setUrl(oldUrl);
+                    repository.update();
                 }
             }
-        }.execute(newSourceUrl, "emojis.xml");
+        }.execute(repository);
     }
 
 }
