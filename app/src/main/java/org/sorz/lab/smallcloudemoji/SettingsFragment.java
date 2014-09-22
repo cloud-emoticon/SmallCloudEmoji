@@ -1,5 +1,6 @@
 package org.sorz.lab.smallcloudemoji;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,6 +33,7 @@ public class SettingsFragment extends PreferenceFragment {
     private DaoMaster daoMaster;
     private DaoSession daoSession;
     private Repository repository;
+    private OnSourceManageClickListener mListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,6 +117,16 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
+        // Click source management
+        Preference sourceManagePreference = findPreference("source_manage");
+        sourceManagePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                mListener.onSourceManageClick();
+                return true;
+            }
+        });
+
         // Restore default source
         Preference restoreSourcePreference = findPreference("restore_source");
         restoreSourcePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -155,9 +167,25 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mListener = (OnSourceManageClickListener) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         daoMaster.getDatabase().close();
+    }
+
+    public interface OnSourceManageClickListener {
+        public void onSourceManageClick();
     }
 
 }
