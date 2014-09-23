@@ -8,18 +8,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.sorz.lab.smallcloudemoji.db.DaoMaster;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
-import org.sorz.lab.smallcloudemoji.db.DaoSessionHolder;
-import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
+import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 
 
 public class SettingsActivity extends Activity implements
-        DaoSessionHolder,
         SettingsFragment.OnSourceManageClickListener {
     private RepositoryFragment repositoryFragment;
-    private DaoMaster daoMaster;
     private DaoSession daoSession;
 
     @Override
@@ -27,9 +23,8 @@ public class SettingsActivity extends Activity implements
         super.onCreate(savedInstanceState);
 
         // Open database.
-        DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(this);
-        daoMaster = databaseOpenHelper.getDaoMaster();
-        daoSession = databaseOpenHelper.getDaoSession();
+        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this, true);
+        daoSession = databaseHelper.getDaoSession();
         DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
 
         setContentView(R.layout.activity_settings);
@@ -62,12 +57,8 @@ public class SettingsActivity extends Activity implements
 
     @Override
     public void onDestroy() {
-        daoMaster.getDatabase().close();
-    }
-
-    @Override
-    public DaoSession getDaoSession() {
-        return daoSession;
+        super.onDestroy();
+        DatabaseHelper.getInstance(this).close();
     }
 
     @Override

@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
-import org.sorz.lab.smallcloudemoji.db.DaoSessionHolder;
+import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 
 
 /**
@@ -27,7 +27,7 @@ public class RepositoryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity();
-        daoSession = ((DaoSessionHolder) context).getDaoSession();
+        daoSession = DatabaseHelper.getInstance(context).getDaoSession();
         adapter = new RepositoryAdapter(context, daoSession);
     }
 

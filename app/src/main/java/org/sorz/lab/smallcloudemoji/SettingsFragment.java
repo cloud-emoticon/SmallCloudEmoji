@@ -14,7 +14,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
-import org.sorz.lab.smallcloudemoji.db.DaoSessionHolder;
+import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
@@ -36,7 +36,7 @@ public class SettingsFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         context = getActivity();
         mListener = (OnSourceManageClickListener) context;
-        daoSession = ((DaoSessionHolder) context).getDaoSession();
+        daoSession = DatabaseHelper.getInstance(context).getDaoSession();
 
         addPreferencesFromResource(R.xml.preferences);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
