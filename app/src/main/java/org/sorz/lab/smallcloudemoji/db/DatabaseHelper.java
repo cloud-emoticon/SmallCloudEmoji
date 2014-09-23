@@ -59,7 +59,7 @@ public class DatabaseHelper {
 
     public void close() {
         userCounter -= 1;
-        if (userCounter == 0) {
+        if (userCounter <= 0) {
             daoMaster.getDatabase().close();
             ourInstance = null;
         }

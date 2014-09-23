@@ -15,6 +15,7 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 
 public class SettingsActivity extends Activity implements
         SettingsFragment.OnSourceManageClickListener {
+    private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private RepositoryFragment repositoryFragment;
     private DaoSession daoSession;
 
@@ -28,7 +29,6 @@ public class SettingsActivity extends Activity implements
         DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
 
         setContentView(R.layout.activity_settings);
-
     }
 
     @Override
@@ -41,9 +41,6 @@ public class SettingsActivity extends Activity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == android.R.id.home) {
             if (getFragmentManager().getBackStackEntryCount() == 0)
@@ -53,6 +50,19 @@ public class SettingsActivity extends Activity implements
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(REPOSITORY_FRAGMENT_IS_SHOWING,
+                repositoryFragment != null && ! repositoryFragment.isHidden());
+    }
+
+    @Override
+    protected void onRestoreInstanceState (Bundle savedInstanceState) {
+        if (savedInstanceState.getBoolean(REPOSITORY_FRAGMENT_IS_SHOWING, false)) {
+            onSourceManageClick();
+        }
     }
 
     @Override
