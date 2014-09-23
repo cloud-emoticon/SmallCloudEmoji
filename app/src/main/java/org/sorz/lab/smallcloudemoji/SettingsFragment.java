@@ -1,6 +1,5 @@
 package org.sorz.lab.smallcloudemoji;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,10 +13,8 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import org.sorz.lab.smallcloudemoji.db.DaoMaster;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
-import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
-import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
+import org.sorz.lab.smallcloudemoji.db.DaoSessionHolder;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
@@ -30,7 +27,6 @@ import java.util.List;
  */
 public class SettingsFragment extends PreferenceFragment {
     private Context context;
-    private DaoMaster daoMaster;
     private DaoSession daoSession;
     private Repository repository;
     private OnSourceManageClickListener mListener;
@@ -39,15 +35,14 @@ public class SettingsFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity();
+        mListener = (OnSourceManageClickListener) context;
+        daoSession = ((DaoSessionHolder) context).getDaoSession();
+
         addPreferencesFromResource(R.xml.preferences);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        // Open database.
-        DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(context);
-        daoMaster = databaseOpenHelper.getDaoMaster();
-        daoSession = databaseOpenHelper.getDaoSession();
-        DatabaseUpgrader.checkAndDoUpgrade(context, daoSession);
-        repository = databaseOpenHelper.getDefaultRepository();
+        repository = daoSession.getRepositoryDao().queryBuilder()
+                .limit(1).unique();
 
         // Usage history clean
         Preference historyCleanPreference = findPreference("history_clean");
@@ -167,12 +162,6 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mListener = (OnSourceManageClickListener) activity;
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -181,7 +170,6 @@ public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        daoMaster.getDatabase().close();
     }
 
     public interface OnSourceManageClickListener {

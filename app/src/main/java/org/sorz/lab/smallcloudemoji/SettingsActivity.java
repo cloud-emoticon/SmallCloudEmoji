@@ -8,15 +8,32 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.sorz.lab.smallcloudemoji.db.DaoMaster;
+import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.DaoSessionHolder;
+import org.sorz.lab.smallcloudemoji.db.DatabaseOpenHelper;
+import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
+
 
 public class SettingsActivity extends Activity implements
+        DaoSessionHolder,
         SettingsFragment.OnSourceManageClickListener {
     private RepositoryFragment repositoryFragment;
+    private DaoMaster daoMaster;
+    private DaoSession daoSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Open database.
+        DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(this);
+        daoMaster = databaseOpenHelper.getDaoMaster();
+        daoSession = databaseOpenHelper.getDaoSession();
+        DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
+
         setContentView(R.layout.activity_settings);
+
     }
 
     @Override
@@ -44,22 +61,25 @@ public class SettingsActivity extends Activity implements
     }
 
     @Override
+    public void onDestroy() {
+        daoMaster.getDatabase().close();
+    }
+
+    @Override
+    public DaoSession getDaoSession() {
+        return daoSession;
+    }
+
+    @Override
     public void onSourceManageClick() {
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentById(R.id.repository_frag);
-
-        if (fragment == null) {
-            Fragment settingsFragment = fragmentManager.findFragmentById(R.id.settings_frag);
-            if (repositoryFragment == null)
-                repositoryFragment = new RepositoryFragment();
-
-            fragmentManager.beginTransaction()
-                    .hide(settingsFragment)
-                    .add(R.id.frame_layout, repositoryFragment)
-                    .addToBackStack(null)
-                    .commit();
-        } else {
-            // TODO: Set focus on repositoryFragment
-        }
+        Fragment settingsFragment = fragmentManager.findFragmentById(R.id.settings_frag);
+        if (repositoryFragment == null)
+            repositoryFragment = new RepositoryFragment();
+        fragmentManager.beginTransaction()
+                .hide(settingsFragment)
+                .add(R.id.settings_container, repositoryFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
