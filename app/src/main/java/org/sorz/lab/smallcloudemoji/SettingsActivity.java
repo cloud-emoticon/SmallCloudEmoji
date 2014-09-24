@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
@@ -14,6 +13,7 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 
 
 public class SettingsActivity extends Activity implements
+        FragmentManager.OnBackStackChangedListener,
         SettingsFragment.OnSourceManageClickListener {
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private RepositoryFragment repositoryFragment;
@@ -22,6 +22,7 @@ public class SettingsActivity extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getFragmentManager().addOnBackStackChangedListener(this);
 
         // Open database.
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this, true);
@@ -32,21 +33,10 @@ public class SettingsActivity extends Activity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            if (getFragmentManager().getBackStackEntryCount() == 0)
-                finish();
-            else
-                getFragmentManager().popBackStack();
+            getFragmentManager().popBackStack();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -69,6 +59,15 @@ public class SettingsActivity extends Activity implements
     public void onDestroy() {
         super.onDestroy();
         DatabaseHelper.getInstance(this).close();
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        ActionBar actionBar = getActionBar();
+        System.out.println(getFragmentManager().getBackStackEntryCount());
+        if (actionBar != null)
+            getActionBar().setDisplayHomeAsUpEnabled(
+                    getFragmentManager().getBackStackEntryCount() > 0);
     }
 
     @Override

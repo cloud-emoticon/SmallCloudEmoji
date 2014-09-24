@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -29,6 +31,8 @@ public class RepositoryFragment extends Fragment {
         context = getActivity();
         daoSession = DatabaseHelper.getInstance(context).getDaoSession();
         adapter = new RepositoryAdapter(context, daoSession);
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -38,6 +42,12 @@ public class RepositoryFragment extends Fragment {
         ListView listView = (ListView) view.findViewById(android.R.id.list);
         listView.setAdapter(adapter);
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.repository_actions, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
 }
