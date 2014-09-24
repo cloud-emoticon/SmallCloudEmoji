@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name=".ViewNewSourceActivity"
+            android:name=".AddRepositoryActivity"
             android:label="@string/title_activity_view_new_source"
             android:theme="@android:style/Theme.Holo.Light.Dialog"
             android:excludeFromRecents="true" >

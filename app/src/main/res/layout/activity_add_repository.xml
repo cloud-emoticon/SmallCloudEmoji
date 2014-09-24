@@ -3,16 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="org.sorz.lab.smallcloudemoji.ViewNewSourceActivity">
+    tools:context="org.sorz.lab.smallcloudemoji.AddRepositoryActivity">
 
 
-    <TextView
-        android:text="@string/source_replace_message"
-        android:layout_width="wrap_content"
+    <EditText
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_margin="15dp"
-        android:id="@+id/textView" />
+        android:id="@+id/repository_url"
+        android:hint="@string/hint_repository_url" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/repository_alias"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/hint_repository_alias" />
 
     <View
         android:layout_width="fill_parent"
@@ -28,7 +33,7 @@
         android:paddingLeft="2dip"
         android:paddingRight="2dip"
         android:measureWithLargestChild="true"
-        android:layout_below="@id/textView">
+        android:layout_below="@id/repository_alias">
 
         <Button
             android:id="@+id/cancel"

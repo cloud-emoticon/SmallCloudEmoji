@@ -46,5 +46,9 @@
     <string name="source_replace_message">Are you sure use this source to replace current one?</string>
     <string name="pref_source_manage_title">Manage sources</string>
     <string name="menu_repository_add">Add repository</string>
+    <string name="hint_repository_url">Repository URL</string>
+    <string name="hint_repository_alias">Alias</string>
+    <string name="input_cannot_be_empty">Must input something here</string>
+    <string name="input_repository_exist">Already added</string>
 
 </resources>
