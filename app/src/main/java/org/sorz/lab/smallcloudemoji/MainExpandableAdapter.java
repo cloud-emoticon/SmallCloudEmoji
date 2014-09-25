@@ -113,13 +113,22 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
-        String title = getGroup(groupPosition).getName();
-        if (convertView != null && convertView instanceof TextView) {
-            ((TextView) convertView).setText(title);
-            return convertView;
+        Category category = getGroup(groupPosition);
+        if (convertView == null)
+            convertView = inflater.inflate(R.layout.item_group, parent, false);
+        TextView text1 = (TextView) convertView.findViewById(android.R.id.text1);
+        TextView text2 = (TextView) convertView.findViewById(android.R.id.text2);
+        text1.setText(category.getName());
+        String repositoryAlias;
+        if (category instanceof FavoriteCategory) {
+            repositoryAlias = "";
         } else {
-            return createGroupView(parent, title);
+            repositoryAlias = category.getRepository().getAlias();
+            if (repositoryAlias.equals("Default"))
+                repositoryAlias = "";
         }
+        text2.setText(repositoryAlias);
+        return convertView;
     }
 
     @Override
@@ -135,12 +144,6 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int i, int i2) {
         return true;
-    }
-
-    private View createGroupView(ViewGroup parent, String title) {
-        TextView textView = (TextView) inflater.inflate(R.layout.item_group, parent, false);
-        textView.setText(title);
-        return textView;
     }
 
     private void convertChildView(View itemView, Entry entry) {
