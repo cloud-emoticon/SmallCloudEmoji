@@ -6,10 +6,12 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
+import org.sorz.lab.smallcloudemoji.db.Repository;
 
 
 public class SettingsActivity extends Activity implements
@@ -66,7 +68,7 @@ public class SettingsActivity extends Activity implements
         ActionBar actionBar = getActionBar();
         System.out.println(getFragmentManager().getBackStackEntryCount());
         if (actionBar != null)
-            getActionBar().setDisplayHomeAsUpEnabled(
+            actionBar.setDisplayHomeAsUpEnabled(
                     getFragmentManager().getBackStackEntryCount() > 0);
     }
 
@@ -81,5 +83,10 @@ public class SettingsActivity extends Activity implements
                 .add(R.id.settings_container, repositoryFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public void syncRepository(View view) {
+        Repository repository = (Repository) ((View) view.getParent()).getTag();
+        new DownloadXmlAsyncTask(this, daoSession).execute(repository);
     }
 }

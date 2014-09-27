@@ -83,6 +83,8 @@ public class RepositoryAdapter implements ListAdapter {
         Repository repository = getItem(position);
         alias.setText(repository.getAlias());
         url.setText(repository.getUrl());
+        convertView.findViewById(R.id.repository_buttons).setTag(repository);
+        convertView.findViewById(R.id.repository_buttons).setTag(repository);
         return convertView;
     }
 

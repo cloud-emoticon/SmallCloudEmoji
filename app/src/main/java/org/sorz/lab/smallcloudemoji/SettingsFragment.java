@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -93,25 +92,6 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
-        // Source address preference: show value as summary.
-        final EditTextPreference sourceUrlPreference =
-                (EditTextPreference) findPreference("source_address");
-        sourceUrlPreference.setSummary(repository.getUrl());
-        sourceUrlPreference.setText(repository.getUrl());
-
-        // Update summaries
-        preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals("source_address")) {
-                    String newUrl = sourceUrlPreference.getText();
-                    sourceUrlPreference.setSummary(newUrl);
-                    repository.setUrl(newUrl);
-                    repository.update();
-                }
-            }
-        });
-
         // Click source management
         Preference sourceManagePreference = findPreference("source_manage");
         sourceManagePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -119,32 +99,6 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceClick(Preference preference) {
                 mListener.onSourceManageClick();
                 return true;
-            }
-        });
-
-        // Restore default source
-        Preference restoreSourcePreference = findPreference("restore_source");
-        restoreSourcePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                String defaultSourceUrl = context.getString(R.string.pref_source_address_default);
-                sourceUrlPreference.setText(defaultSourceUrl);
-                sourceUrlPreference.setSummary(defaultSourceUrl);
-                repository.setUrl(defaultSourceUrl);
-                repository.update();
-                Toast.makeText(context, R.string.pref_restore_source_done,
-                        Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
-
-        // Sync source
-        Preference syncSourcePreference = findPreference("sync_source");
-        syncSourcePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                new DownloadXmlAsyncTask(context, daoSession).execute(repository);
-                return false;
             }
         });
 
