@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
-import org.sorz.lab.smallcloudemoji.RepositoryXmlLoader;
+import org.sorz.lab.smallcloudemoji.parsers.RepositoryXmlLoader;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,6 +46,7 @@ public class DatabaseUpgrader {
                 }
         }
         repository.resetCategories();
+        //noinspection ResultOfMethodCallIgnored
         xmlFile.delete();
 
         File databaseFile = context.getDatabasePath("emoji.db");
@@ -73,6 +74,7 @@ public class DatabaseUpgrader {
                 if (sqLiteDatabase != null)
                     sqLiteDatabase.close();
             }
+            //noinspection ResultOfMethodCallIgnored
             databaseFile.delete();
         }
 

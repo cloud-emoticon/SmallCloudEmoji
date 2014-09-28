@@ -1,4 +1,4 @@
-package org.sorz.lab.smallcloudemoji;
+package org.sorz.lab.smallcloudemoji.tasks;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -8,10 +8,14 @@ import android.widget.Toast;
 
 import com.google.common.io.CountingInputStream;
 
+import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.sorz.lab.smallcloudemoji.parsers.LoadingCancelException;
+import org.sorz.lab.smallcloudemoji.parsers.RepositoryLoaderEventListener;
+import org.sorz.lab.smallcloudemoji.parsers.RepositoryXmlLoader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
@@ -26,7 +30,7 @@ import java.net.URL;
 /**
  * Download and save a XML file.
  */
-class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
+public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
     private Context context;
     private DaoSession daoSession;
     private ProgressDialog progressDialog;

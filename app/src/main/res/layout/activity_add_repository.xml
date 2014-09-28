@@ -3,13 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="org.sorz.lab.smallcloudemoji.AddRepositoryActivity">
+    tools:context="org.sorz.lab.smallcloudemoji.activites.AddRepositoryActivity">
 
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/repository_url"
+        android:inputType="textUri"
         android:hint="@string/hint_repository_url" />
 
     <EditText
@@ -32,8 +33,7 @@
         android:paddingTop="0dip"
         android:paddingLeft="2dip"
         android:paddingRight="2dip"
-        android:measureWithLargestChild="true"
-        android:layout_below="@id/repository_alias">
+        android:measureWithLargestChild="true" >
 
         <Button
             android:id="@+id/cancel"
@@ -51,6 +51,6 @@
             android:layout_weight="1"
             android:text="@android:string/ok"
             android:onClick="confirm" />
-    </LinearLayout>>
+    </LinearLayout>
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package org.sorz.lab.smallcloudemoji;
+package org.sorz.lab.smallcloudemoji.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +10,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;

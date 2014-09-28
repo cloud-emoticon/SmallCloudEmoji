@@ -9,7 +9,7 @@
  * Copyright 2014 KTachibanaM for the original file
  * Licensed under the Apache License, Version 2.0
  */
-package org.sorz.lab.smallcloudemoji;
+package org.sorz.lab.smallcloudemoji.parsers;
 
 import android.util.Xml;
 
@@ -114,6 +114,7 @@ public class RepositoryXmlLoader {
             String tagName = parser.getName();
             if (tagName.equals("infoos")) {
                 // Ignore infoos
+                //noinspection StatementWithEmptyBody
                 while (parser.next() != XmlPullParser.END_TAG ||
                         ! parser.getName().equals("infoos"))
                     ;

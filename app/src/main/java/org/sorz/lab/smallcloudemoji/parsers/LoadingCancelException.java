@@ -1,4 +1,4 @@
-package org.sorz.lab.smallcloudemoji;
+package org.sorz.lab.smallcloudemoji.parsers;
 
 /**
  * Used by RepositoryXmlLoading.

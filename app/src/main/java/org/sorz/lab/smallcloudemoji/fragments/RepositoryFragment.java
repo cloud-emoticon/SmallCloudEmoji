@@ -1,4 +1,4 @@
-package org.sorz.lab.smallcloudemoji;
+package org.sorz.lab.smallcloudemoji.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import org.sorz.lab.smallcloudemoji.R;
+import org.sorz.lab.smallcloudemoji.activites.AddRepositoryActivity;
+import org.sorz.lab.smallcloudemoji.adapters.RepositoryAdapter;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 
@@ -78,7 +81,7 @@ public class RepositoryFragment extends Fragment {
 
     public void notifyRepositoriesChanged() {
         adapter.notifyDataSetChanged();
-        listView.invalidateViews();  // This shit waste my one hour.
+        listView.invalidateViews();  // This shit wasted my one hour.
     }
 
 }

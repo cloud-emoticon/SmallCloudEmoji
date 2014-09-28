@@ -1,4 +1,4 @@
-package org.sorz.lab.smallcloudemoji;
+package org.sorz.lab.smallcloudemoji.fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,6 +12,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Entry;

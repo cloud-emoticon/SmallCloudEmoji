@@ -16,11 +16,14 @@ import android.widget.Toast;
 import com.sony.smallapp.SmallAppWindow;
 import com.sony.smallapp.SmallApplication;
 
+import org.sorz.lab.smallcloudemoji.activites.SettingsActivity;
+import org.sorz.lab.smallcloudemoji.adapters.MainExpandableAdapter;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.sorz.lab.smallcloudemoji.tasks.DownloadXmlAsyncTask;
 
 import java.util.Date;
 

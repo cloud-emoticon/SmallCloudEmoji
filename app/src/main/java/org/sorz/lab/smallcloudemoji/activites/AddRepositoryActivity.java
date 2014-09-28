@@ -1,4 +1,4 @@
-package org.sorz.lab.smallcloudemoji;
+package org.sorz.lab.smallcloudemoji.activites;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
+import org.sorz.lab.smallcloudemoji.tasks.DownloadXmlAsyncTask;
 
 
 public class AddRepositoryActivity extends Activity {

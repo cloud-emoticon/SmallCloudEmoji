@@ -1,4 +1,4 @@
-package org.sorz.lab.smallcloudemoji;
+package org.sorz.lab.smallcloudemoji.activites;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 
+import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.CategoryDao;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
@@ -18,6 +19,9 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.sorz.lab.smallcloudemoji.fragments.RepositoryFragment;
+import org.sorz.lab.smallcloudemoji.fragments.SettingsFragment;
+import org.sorz.lab.smallcloudemoji.tasks.DownloadXmlAsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
