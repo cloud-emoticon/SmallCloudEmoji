@@ -5,7 +5,7 @@ import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
@@ -17,18 +17,22 @@ import java.util.List;
 /**
  * Get repositories from database and generate a view for each them.
  */
-public class RepositoryAdapter implements ListAdapter {
+public class RepositoryAdapter extends BaseAdapter {
     final private Context context;
     final private LayoutInflater inflater;
-    private DaoSession daoSession;
     private List<Repository> repositories;
+    private RepositoryDao repositoryDao;
 
     public RepositoryAdapter(Context context, DaoSession daoSession) {
+        super();
         this.context = context;
-        this.daoSession = daoSession;
+        repositoryDao = daoSession.getRepositoryDao();
         inflater = LayoutInflater.from(context);
 
-        RepositoryDao repositoryDao = daoSession.getRepositoryDao();
+        loadRepositories();
+    }
+
+    private void loadRepositories() {
         repositories = repositoryDao.queryBuilder()
                 .orderAsc(RepositoryDao.Properties.Order)
                 .list();
@@ -84,7 +88,6 @@ public class RepositoryAdapter implements ListAdapter {
         alias.setText(repository.getAlias());
         url.setText(repository.getUrl());
         convertView.findViewById(R.id.repository_buttons).setTag(repository);
-        convertView.findViewById(R.id.repository_buttons).setTag(repository);
         return convertView;
     }
 
@@ -101,5 +104,11 @@ public class RepositoryAdapter implements ListAdapter {
     @Override
     public boolean isEmpty() {
         return repositories.isEmpty();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        loadRepositories();
+        super.notifyDataSetChanged();
     }
 }

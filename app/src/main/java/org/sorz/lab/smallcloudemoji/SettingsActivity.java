@@ -2,16 +2,25 @@ package org.sorz.lab.smallcloudemoji;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 
+import org.sorz.lab.smallcloudemoji.db.Category;
+import org.sorz.lab.smallcloudemoji.db.CategoryDao;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
+import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class SettingsActivity extends Activity implements
@@ -66,7 +75,6 @@ public class SettingsActivity extends Activity implements
     @Override
     public void onBackStackChanged() {
         ActionBar actionBar = getActionBar();
-        System.out.println(getFragmentManager().getBackStackEntryCount());
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(
                     getFragmentManager().getBackStackEntryCount() > 0);
@@ -88,5 +96,74 @@ public class SettingsActivity extends Activity implements
     public void syncRepository(View view) {
         Repository repository = (Repository) ((View) view.getParent()).getTag();
         new DownloadXmlAsyncTask(this, daoSession).execute(repository);
+    }
+
+    public void popMoreMenu(View view) {
+        final Repository repository = (Repository) ((View) view.getParent()).getTag();
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.inflate(R.menu.repository_more);
+
+        // Disable deleting if only one remaining.
+        long numRepositories = daoSession.getRepositoryDao().queryBuilder()
+                .count();
+        if (numRepositories <= 1)
+            popupMenu.getMenu().findItem(R.id.menu_repository_delete).setEnabled(false);
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.menu_repository_delete) {
+                    deleteRepositoryIfConfirmed(repository);
+                }
+                return true;
+            }
+        });
+        popupMenu.show();
+    }
+
+    private void deleteRepositoryIfConfirmed(final Repository repository) {
+        // Generate message according to whether stars the on repository.
+        String message = String.format(getString(R.string.confirm_delete_repository_part1),
+                repository.getAlias());
+        List<Category> categories = repository.getCategories();
+        final List<Long> categoryIds = new ArrayList<Long>(categories.size());
+        for (Category category : categories)
+            categoryIds.add(category.getId());
+        long numStar = daoSession.getEntryDao().queryBuilder()
+                .where(EntryDao.Properties.CategoryId.in(categoryIds),
+                        EntryDao.Properties.Star.eq(true))
+                .count();
+        if (numStar > 0)
+            message += String.format(getString(R.string.confirm_delete_repository_part2),
+                    numStar);
+
+        // The actual code deleting the repository.
+        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                daoSession.runInTx(new Runnable() {
+                    @Override
+                    public void run() {
+                        daoSession.getEntryDao().queryBuilder()
+                                .where(EntryDao.Properties.CategoryId.in(categoryIds))
+                                .buildDelete().executeDeleteWithoutDetachingEntities();
+                        daoSession.getCategoryDao().queryBuilder()
+                                .where(CategoryDao.Properties.RepositoryId.eq(repository.getId()))
+                                .buildDelete().executeDeleteWithoutDetachingEntities();
+                        repository.delete();
+                    }
+                });
+                repositoryFragment.notifyRepositoriesChanged();
+            }
+        };
+
+        // Show alert dialog.
+        new AlertDialog.Builder(SettingsActivity.this)
+                .setCancelable(true)
+                .setTitle(R.string.confirm_delete_repository_title)
+                .setMessage(message)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.yes, onClickListener)
+                .show();
     }
 }

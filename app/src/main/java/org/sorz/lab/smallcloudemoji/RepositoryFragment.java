@@ -24,6 +24,7 @@ public class RepositoryFragment extends Fragment {
     private Context context;
     private DaoSession daoSession;
     private RepositoryAdapter adapter;
+    private ListView listView;
 
     public RepositoryFragment() {
     }
@@ -42,7 +43,7 @@ public class RepositoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_repository, container, false);
-        ListView listView = (ListView) view.findViewById(android.R.id.list);
+        listView = (ListView) view.findViewById(android.R.id.list);
         listView.setAdapter(adapter);
         return view;
     }
@@ -68,11 +69,16 @@ public class RepositoryFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_FOR_ADDING_REPOSITORY) {
             if (resultCode == AddRepositoryActivity.RESULT_SUCCESS_ADDED) {
-                // TODO: Refresh repositories list
+                notifyRepositoriesChanged();
             }
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void notifyRepositoriesChanged() {
+        adapter.notifyDataSetChanged();
+        listView.invalidateViews();  // This shit waste my one hour.
     }
 
 }
