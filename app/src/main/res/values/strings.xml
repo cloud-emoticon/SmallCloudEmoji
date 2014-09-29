@@ -53,4 +53,5 @@
     <string name="confirm_delete_repository_title">Delete confirmation</string>
     <string name="confirm_delete_repository_part1">Are you sure delete %s?</string>
     <string name="confirm_delete_repository_part2">\n%s favorites will be dropped.</string>
+    <string name="menu_repository_sync">Sync</string>
 </resources>

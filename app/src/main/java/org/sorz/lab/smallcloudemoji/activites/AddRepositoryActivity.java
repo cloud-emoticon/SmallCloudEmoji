@@ -49,6 +49,7 @@ public class AddRepositoryActivity extends Activity {
         final String url = urlTextView.getText().toString().trim();
         final String alias = aliasTextView.getText().toString().trim();
 
+        // Verify input.
         if (url.isEmpty() || alias.isEmpty()) {
             if (url.isEmpty())
                 urlTextView.setError(getString(R.string.input_cannot_be_empty));
@@ -57,6 +58,7 @@ public class AddRepositoryActivity extends Activity {
             return;
         }
 
+        // Check duplication.
         boolean exist = repositoryDao.queryBuilder()
                 .where(RepositoryDao.Properties.Url.eq(url))
                 .count() != 0;
@@ -64,8 +66,16 @@ public class AddRepositoryActivity extends Activity {
             urlTextView.setError(getString(R.string.input_repository_exist));
             return;
         }
-        Repository repository = new Repository(null, url, alias, false, 0, null);
 
+        // Get smallest order for adding on top.
+        Repository topRepository =  repositoryDao.queryBuilder()
+                .orderAsc(RepositoryDao.Properties.Order)
+                .limit(1).unique();
+        int order = 100;
+        if (topRepository != null)
+            order = topRepository.getOrder() - 10;
+
+        Repository repository = new Repository(null, url, alias, false, order, null);
         new DownloadXmlAsyncTask(this, daoSession) {
             @Override
             protected void onPostExecute(Integer result) {

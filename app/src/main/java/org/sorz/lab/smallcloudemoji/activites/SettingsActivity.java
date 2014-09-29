@@ -20,6 +20,7 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
 import org.sorz.lab.smallcloudemoji.fragments.RepositoryFragment;
 import org.sorz.lab.smallcloudemoji.fragments.SettingsFragment;
 import org.sorz.lab.smallcloudemoji.tasks.DownloadXmlAsyncTask;
@@ -28,11 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class SettingsActivity extends Activity implements
         FragmentManager.OnBackStackChangedListener,
         SettingsFragment.OnSourceManageClickListener {
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private RepositoryFragment repositoryFragment;
+    private RepositoryDao repositoryDao;
     private DaoSession daoSession;
 
     @Override
@@ -43,6 +46,7 @@ public class SettingsActivity extends Activity implements
         // Open database.
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this, true);
         daoSession = databaseHelper.getDaoSession();
+        repositoryDao = daoSession.getRepositoryDao();
         DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
 
         setContentView(R.layout.activity_settings);
@@ -98,9 +102,13 @@ public class SettingsActivity extends Activity implements
                 .commit();
     }
 
+    private Repository getRepositoryFromView(View view) {
+        return (Repository) ((View) view.getParent()).getTag();
+    }
+
     public void hideRepository(View view) {
         ImageButton button = (ImageButton) view;
-        Repository repository = (Repository) ((View) view.getParent()).getTag();
+        Repository repository = getRepositoryFromView(view);
         repository.setHidden(! repository.getHidden());
         repository.update();
         if (repository.getHidden())
@@ -109,18 +117,44 @@ public class SettingsActivity extends Activity implements
             button.setBackgroundResource(R.drawable.ic_eye_normal);
     }
 
-    public void syncRepository(View view) {
-        Repository repository = (Repository) ((View) view.getParent()).getTag();
-        new DownloadXmlAsyncTask(this, daoSession).execute(repository);
+    public void moveUpRepository(View view) {
+        Repository repository = getRepositoryFromView(view);
+        Repository targetRepository = repositoryDao.queryBuilder()
+                .where(RepositoryDao.Properties.Order.lt(repository.getOrder()))
+                .orderDesc(RepositoryDao.Properties.Order)
+                .limit(1).unique();
+        swapRepositoryOrder(repository, targetRepository);
+    }
+
+    public void moveDownRepository(View view) {
+        Repository repository = getRepositoryFromView(view);
+        Repository targetRepository = repositoryDao.queryBuilder()
+                .where(RepositoryDao.Properties.Order.gt(repository.getOrder()))
+                .orderAsc(RepositoryDao.Properties.Order)
+                .limit(1).unique();
+        swapRepositoryOrder(repository, targetRepository);
+    }
+
+    private void swapRepositoryOrder(Repository repositoryA, Repository repositoryB) {
+        if (repositoryA == null || repositoryB == null)
+            return;
+        System.out.printf("%s (%d) <=> %s (%d)\n", repositoryA.getAlias(), repositoryA.getOrder(),
+                repositoryB.getAlias(), repositoryB.getOrder());
+
+        int order = repositoryA.getOrder();
+        repositoryA.setOrder(repositoryB.getOrder());
+        repositoryB.setOrder(order);
+        repositoryDao.updateInTx(repositoryA, repositoryB);
+        repositoryFragment.notifyRepositoriesChanged();
     }
 
     public void popMoreMenu(View view) {
-        final Repository repository = (Repository) ((View) view.getParent()).getTag();
+        final Repository repository = getRepositoryFromView(view);
         PopupMenu popupMenu = new PopupMenu(this, view);
         popupMenu.inflate(R.menu.repository_more);
 
         // Disable deleting if only one remaining.
-        long numRepositories = daoSession.getRepositoryDao().queryBuilder()
+        long numRepositories = repositoryDao.queryBuilder()
                 .count();
         if (numRepositories <= 1)
             popupMenu.getMenu().findItem(R.id.menu_repository_delete).setEnabled(false);
@@ -128,13 +162,19 @@ public class SettingsActivity extends Activity implements
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.menu_repository_delete) {
-                    deleteRepositoryIfConfirmed(repository);
-                }
-                return true;
+                return moreMenuItemClicked(menuItem.getItemId(), repository);
             }
         });
         popupMenu.show();
+    }
+
+    private boolean moreMenuItemClicked(int itemId, Repository repository) {
+        if (itemId == R.id.menu_repository_sync) {
+            new DownloadXmlAsyncTask(this, daoSession).execute(repository);
+        } if (itemId == R.id.menu_repository_delete) {
+            deleteRepositoryIfConfirmed(repository);
+        }
+        return true;
     }
 
     private void deleteRepositoryIfConfirmed(final Repository repository) {

@@ -52,9 +52,16 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/button_sync"
-                android:background="@drawable/ic_sync"
-                android:onClick="syncRepository" />
+                android:id="@+id/button_up"
+                android:background="@drawable/ic_up"
+                android:onClick="moveUpRepository" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_down"
+                android:background="@drawable/ic_down"
+                android:onClick="moveDownRepository" />
 
             <ImageButton
                 android:layout_width="wrap_content"
