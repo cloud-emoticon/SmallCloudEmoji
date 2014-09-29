@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
 import org.sorz.lab.smallcloudemoji.R;
@@ -95,6 +96,17 @@ public class SettingsActivity extends Activity implements
                 .add(R.id.settings_container, repositoryFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public void hideRepository(View view) {
+        ImageButton button = (ImageButton) view;
+        Repository repository = (Repository) ((View) view.getParent()).getTag();
+        repository.setHidden(! repository.getHidden());
+        repository.update();
+        if (repository.getHidden())
+            button.setBackgroundResource(R.drawable.ic_eye_slash);
+        else
+            button.setBackgroundResource(R.drawable.ic_eye_normal);
     }
 
     public void syncRepository(View view) {

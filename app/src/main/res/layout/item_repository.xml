@@ -45,6 +45,13 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/button_hidden"
+                android:background="@drawable/ic_eye_normal"
+                android:onClick="hideRepository" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/button_sync"
                 android:background="@drawable/ic_sync"
                 android:onClick="syncRepository" />

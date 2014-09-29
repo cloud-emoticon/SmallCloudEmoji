@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.sorz.lab.smallcloudemoji.R;
@@ -85,9 +86,14 @@ public class RepositoryAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.item_repository, parent, false);
         TextView alias = (TextView) convertView.findViewById(R.id.repository_alias);
         TextView url = (TextView) convertView.findViewById(R.id.repository_url);
+        ImageButton hiddenButton = (ImageButton) convertView.findViewById(R.id.button_hidden);
         Repository repository = getItem(position);
         alias.setText(repository.getAlias());
         url.setText(repository.getUrl());
+        if (repository.getHidden())
+            hiddenButton.setBackgroundResource(R.drawable.ic_eye_slash);
+        else
+            hiddenButton.setBackgroundResource(R.drawable.ic_eye_normal);
         convertView.findViewById(R.id.repository_buttons).setTag(repository);
         return convertView;
     }
