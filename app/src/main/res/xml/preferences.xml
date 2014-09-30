@@ -20,6 +20,12 @@
             android:defaultValue="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/pref_source_title">
+        <Preference
+            android:key="source_manage"
+            android:title="@string/pref_source_manage_title" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/list_title_favorite">
         <Preference
             android:key="history_clean"
@@ -30,11 +36,6 @@
             android:summary="@string/pref_star_clean_summary" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/pref_source_title">
-        <Preference
-            android:key="source_manage"
-            android:title="@string/pref_source_manage_title" />
-    </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_about_title">
         <Preference
