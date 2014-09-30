@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 20
-        versionCode 10
-        versionName "0.4"
+        versionCode 11
+        versionName "0.4.1"
     }
 
     sourceSets {
@@ -21,7 +21,7 @@ android {
 
     buildTypes {
         release {
-            runProguard true
+            runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
