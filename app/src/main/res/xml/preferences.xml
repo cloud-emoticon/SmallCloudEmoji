@@ -34,9 +34,6 @@
         <Preference
             android:key="source_manage"
             android:title="@string/pref_source_manage_title" />
-        <Preference
-            android:key="restore_source"
-            android:title="@string/pref_restore_source_title" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_about_title">

@@ -28,8 +28,6 @@
     <string name="pref_favorites_title">我的收藏</string>
     <string name="pref_github_summary">去 GitHub 查看源码</string>
     <string name="pref_github_title">源代码</string>
-    <string name="pref_restore_source_done">源地址已恢复为默认。</string>
-    <string name="pref_restore_source_title">重置为默认</string>
     <string name="pref_show_note_title">显示条目备注信息</string>
     <string name="pref_source_address_title">源地址</string>
     <string name="pref_source_title">源</string>
@@ -40,6 +38,5 @@
     <string name="pref_version_unknown">未知版本</string>
     <string name="toast_copied">颜文字已复制</string>
     <string name="title_activity_view_new_source">添加源</string>
-    <string name="source_replace_message">确认替换小云颜文字当前使用的源吗？</string>
 
 </resources>
