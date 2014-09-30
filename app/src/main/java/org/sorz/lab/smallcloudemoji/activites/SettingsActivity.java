@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class SettingsActivity extends Activity implements
         FragmentManager.OnBackStackChangedListener,
         SettingsFragment.OnSourceManageClickListener {
@@ -66,11 +65,11 @@ public class SettingsActivity extends Activity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(REPOSITORY_FRAGMENT_IS_SHOWING,
-                repositoryFragment != null && ! repositoryFragment.isHidden());
+                repositoryFragment != null && !repositoryFragment.isHidden());
     }
 
     @Override
-    protected void onRestoreInstanceState (Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState.getBoolean(REPOSITORY_FRAGMENT_IS_SHOWING, false)) {
             onSourceManageClick();
         }
@@ -110,7 +109,7 @@ public class SettingsActivity extends Activity implements
     public void hideRepository(View view) {
         ImageButton button = (ImageButton) view;
         Repository repository = getRepositoryFromView(view);
-        repository.setHidden(! repository.getHidden());
+        repository.setHidden(!repository.getHidden());
         repository.update();
         if (repository.getHidden())
             button.setBackgroundResource(R.drawable.ic_eye_slash);
@@ -200,7 +199,7 @@ public class SettingsActivity extends Activity implements
                 .setCancelable(true)
                 .setView(editText)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.yes,  onClickListener)
+                .setPositiveButton(android.R.string.yes, onClickListener)
                 .show();
         editText.requestFocus();
     }

@@ -24,11 +24,11 @@ public class DatabaseUpgrader {
 
     static public void checkAndDoUpgrade(Context context, DaoSession daoSession) {
         File xmlFile = context.getFileStreamPath("emojis.xml");
-        if (! xmlFile.exists())
+        if (!xmlFile.exists())
             return;
         RepositoryDao repositoryDao = daoSession.getRepositoryDao();
         Repository repository = repositoryDao.queryBuilder().limit(1).unique();
-        if (! repository.getCategories().isEmpty())
+        if (!repository.getCategories().isEmpty())
             return;
 
         Reader reader = null;

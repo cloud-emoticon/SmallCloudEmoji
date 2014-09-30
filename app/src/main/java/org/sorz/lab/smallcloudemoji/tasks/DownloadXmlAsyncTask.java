@@ -146,7 +146,7 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
     protected void onPostExecute(Integer result) {
         progressDialog.dismiss();
         if (R.string.download_success == result) {
-                Toast.makeText(context, R.string.download_success, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.download_success, Toast.LENGTH_SHORT).show();
         } else {
             String message = String.format(
                     context.getString(R.string.download_fail),

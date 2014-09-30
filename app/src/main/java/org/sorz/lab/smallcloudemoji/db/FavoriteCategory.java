@@ -7,7 +7,7 @@ import org.sorz.lab.smallcloudemoji.R;
 import java.util.List;
 
 /**
- * Created by xierch on 2014/9/16.
+ * Collect all stared entries. Only getEntries() and resetEntries() are available.
  */
 public class FavoriteCategory extends Category {
     private List<Entry> entries;
@@ -27,7 +27,7 @@ public class FavoriteCategory extends Category {
                     .where(EntryDao.Properties.Star.eq(true))
                     .list();
             synchronized (this) {
-                if(entries == null) {
+                if (entries == null) {
                     entries = entriesNew;
                 }
             }

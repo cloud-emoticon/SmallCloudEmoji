@@ -66,8 +66,7 @@ public class MainApplication extends SmallApplication {
                 protected void onPostExecute(Integer result) {
                     super.onPostExecute(result);
                     repository.resetCategories();
-                    //if (adapter != null)
-                        adapter.notifyDataSetChanged(true);
+                    adapter.notifyDataSetChanged(true);
                     getWindow().setWindowState(SmallAppWindow.WindowState.NORMAL);
                 }
             }.execute(repository);
@@ -122,10 +121,10 @@ public class MainApplication extends SmallApplication {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Object tag = view.getTag();
-                if (! (tag instanceof Entry))
+                if (!(tag instanceof Entry))
                     return false;
                 Entry entry = (Entry) tag;
-                entry.setStar(! entry.getStar());
+                entry.setStar(!entry.getStar());
                 entry.update();
                 adapter.notifyDataSetChanged();
                 return true;

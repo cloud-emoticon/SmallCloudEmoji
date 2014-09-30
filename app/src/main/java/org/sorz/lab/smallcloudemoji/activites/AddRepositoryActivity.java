@@ -68,7 +68,7 @@ public class AddRepositoryActivity extends Activity {
         }
 
         // Get smallest order for adding on top.
-        Repository topRepository =  repositoryDao.queryBuilder()
+        Repository topRepository = repositoryDao.queryBuilder()
                 .orderAsc(RepositoryDao.Properties.Order)
                 .limit(1).unique();
         int order = 100;

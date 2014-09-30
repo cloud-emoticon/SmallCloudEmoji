@@ -9,6 +9,7 @@ import org.sorz.lab.smallcloudemoji.db.Entry;
 public interface RepositoryLoaderEventListener {
     /**
      * Be called at beginning of loading a category and it's entries.
+     *
      * @param category The category that is loading currently.
      * @return Cancel whole loading process if return true.
      */
@@ -16,6 +17,7 @@ public interface RepositoryLoaderEventListener {
 
     /**
      * Ce called after a entry is loaded.
+     *
      * @param entry The entry that is loaded.
      * @return Cancel whole loading process if return true.
      */

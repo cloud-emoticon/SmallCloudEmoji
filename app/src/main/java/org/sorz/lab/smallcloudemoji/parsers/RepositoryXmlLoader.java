@@ -84,7 +84,7 @@ public class RepositoryXmlLoader {
                         repository.delete();
                     }
                     // Delete all outdated items.
-                    if (! repository.getLastUpdateDate().equals(updateDate)) {
+                    if (!repository.getLastUpdateDate().equals(updateDate)) {
                         entryDao.queryBuilder()
                                 .where(EntryDao.Properties.LastUpdateDate.notEq(updateDate))
                                 .buildDelete().executeDeleteWithoutDetachingEntities();
@@ -116,7 +116,7 @@ public class RepositoryXmlLoader {
                 // Ignore infoos
                 //noinspection StatementWithEmptyBody
                 while (parser.next() != XmlPullParser.END_TAG ||
-                        ! parser.getName().equals("infoos"))
+                        !parser.getName().equals("infoos"))
                     ;
             } else if (tagName.equals("category")) {
                 loadCategory(parser, repository);
@@ -133,7 +133,7 @@ public class RepositoryXmlLoader {
         Category category = null;
         // Try to get category from database first
         // if the repository which it belong to is not new added one.
-        if (! repository.getLastUpdateDate().equals(updateDate)) {
+        if (!repository.getLastUpdateDate().equals(updateDate)) {
             category = categoryDao.queryBuilder()
                     .where(CategoryDao.Properties.RepositoryId.eq(repository.getId()),
                             CategoryDao.Properties.Name.eq(categoryName))
@@ -163,7 +163,7 @@ public class RepositoryXmlLoader {
         }
         List<Entry> updateEntries = new ArrayList<Entry>();
         List<Entry> insertEntries = new ArrayList<Entry>();
-        if (! category.getLastUpdateDate().equals(updateDate)) {
+        if (!category.getLastUpdateDate().equals(updateDate)) {
             List<Entry> oldEntries = entryDao.queryBuilder()
                     .where(EntryDao.Properties.CategoryId.eq(category.getId()))
                     .list();
@@ -191,7 +191,7 @@ public class RepositoryXmlLoader {
         entryDao.insertInTx(insertEntries);
         entryDao.updateInTx(updateEntries);
 
-        if (! category.getLastUpdateDate().equals(updateDate)) {
+        if (!category.getLastUpdateDate().equals(updateDate)) {
             category.setLastUpdateDate(updateDate);
             category.update();
         }

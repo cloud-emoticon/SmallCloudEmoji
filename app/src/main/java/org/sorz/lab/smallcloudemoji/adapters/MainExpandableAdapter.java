@@ -153,7 +153,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         View star = itemView.findViewById(R.id.star);
 
         text1.setText(entry.getEmoticon());
-        if (showNote && ! entry.getDescription().isEmpty()) {
+        if (showNote && !entry.getDescription().isEmpty()) {
             text2.setText(entry.getDescription());
             text2.setVisibility(View.VISIBLE);
         } else {

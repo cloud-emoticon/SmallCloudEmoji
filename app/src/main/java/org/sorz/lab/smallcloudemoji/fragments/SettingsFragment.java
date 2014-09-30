@@ -3,13 +3,11 @@ package org.sorz.lab.smallcloudemoji.fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import org.sorz.lab.smallcloudemoji.R;
@@ -17,7 +15,6 @@ import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.EntryDao;
-import org.sorz.lab.smallcloudemoji.db.Repository;
 
 import java.util.List;
 
@@ -28,7 +25,6 @@ import java.util.List;
 public class SettingsFragment extends PreferenceFragment {
     private Context context;
     private DaoSession daoSession;
-    private Repository repository;
     private OnSourceManageClickListener mListener;
 
     @Override
@@ -39,10 +35,6 @@ public class SettingsFragment extends PreferenceFragment {
         daoSession = DatabaseHelper.getInstance(context).getDaoSession();
 
         addPreferencesFromResource(R.xml.preferences);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        repository = daoSession.getRepositoryDao().queryBuilder()
-                .limit(1).unique();
 
         // Usage history clean
         Preference historyCleanPreference = findPreference("history_clean");
@@ -74,20 +66,20 @@ public class SettingsFragment extends PreferenceFragment {
                         .setCancelable(true);
                 builder.setPositiveButton(android.R.string.ok,
                         new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EntryDao entryDao = daoSession.getEntryDao();
-                        List<Entry> entries = entryDao.queryBuilder()
-                                .where(EntryDao.Properties.Star.eq(true))
-                                .list();
-                        for (Entry entry : entries) {
-                            entry.setStar(false);
-                        }
-                        entryDao.updateInTx(entries);
-                        Toast.makeText(context, R.string.pref_star_clean_done,
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                EntryDao entryDao = daoSession.getEntryDao();
+                                List<Entry> entries = entryDao.queryBuilder()
+                                        .where(EntryDao.Properties.Star.eq(true))
+                                        .list();
+                                for (Entry entry : entries) {
+                                    entry.setStar(false);
+                                }
+                                entryDao.updateInTx(entries);
+                                Toast.makeText(context, R.string.pref_star_clean_done,
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
                 builder.show();
                 return true;
             }
