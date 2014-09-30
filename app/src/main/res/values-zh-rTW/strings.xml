@@ -38,4 +38,17 @@
     <string name="pref_version_unknown">未知版本</string>
     <string name="toast_copied">顏文字已複製</string>
     <string name="title_activity_view_new_source">添加源</string>
+    <string name="pref_source_manage_title">管理源</string>
+    <string name="menu_repository_add">添加</string>
+    <string name="hint_repository_url">地址</string>
+    <string name="hint_repository_alias">別名</string>
+    <string name="input_cannot_be_empty">請輸入</string>
+    <string name="input_repository_exist">該源已存在</string>
+    <string name="menu_repository_delete">刪除</string>
+    <string name="confirm_delete_repository_title">確認刪除</string>
+    <string name="confirm_delete_repository_part1">要刪除 %s 嗎？</string>
+    <string name="confirm_delete_repository_part2">\n%s 個收藏將被同時移除。</string>
+    <string name="menu_repository_sync">同步</string>
+    <string name="menu_repository_rename">重命名</string>
+    <string name="repository_rename_title">新別名</string>
 </resources>
