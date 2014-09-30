@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
@@ -138,8 +139,6 @@ public class SettingsActivity extends Activity implements
     private void swapRepositoryOrder(Repository repositoryA, Repository repositoryB) {
         if (repositoryA == null || repositoryB == null)
             return;
-        System.out.printf("%s (%d) <=> %s (%d)\n", repositoryA.getAlias(), repositoryA.getOrder(),
-                repositoryB.getAlias(), repositoryB.getOrder());
 
         int order = repositoryA.getOrder();
         repositoryA.setOrder(repositoryB.getOrder());
@@ -171,10 +170,39 @@ public class SettingsActivity extends Activity implements
     private boolean moreMenuItemClicked(int itemId, Repository repository) {
         if (itemId == R.id.menu_repository_sync) {
             new DownloadXmlAsyncTask(this, daoSession).execute(repository);
-        } if (itemId == R.id.menu_repository_delete) {
+        } else if (itemId == R.id.menu_repository_rename) {
+            renameRepository(repository);
+        } else if (itemId == R.id.menu_repository_delete) {
             deleteRepositoryIfConfirmed(repository);
         }
         return true;
+    }
+
+    private void renameRepository(final Repository repository) {
+        final EditText editText = new EditText(this);
+        editText.setText(repository.getAlias());
+        editText.selectAll();
+
+        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String newAlias = editText.getText().toString().trim();
+                if (newAlias.isEmpty())
+                    return;
+                repository.setAlias(newAlias);
+                repository.update();
+                repositoryFragment.notifyRepositoriesChanged();
+            }
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.repository_rename_title)
+                .setCancelable(true)
+                .setView(editText)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.yes,  onClickListener)
+                .show();
+        editText.requestFocus();
     }
 
     private void deleteRepositoryIfConfirmed(final Repository repository) {
@@ -214,7 +242,7 @@ public class SettingsActivity extends Activity implements
         };
 
         // Show alert dialog.
-        new AlertDialog.Builder(SettingsActivity.this)
+        new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.confirm_delete_repository_title)
                 .setMessage(message)
