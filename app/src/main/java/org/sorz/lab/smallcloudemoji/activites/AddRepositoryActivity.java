@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.sorz.lab.smallcloudemoji.R;
@@ -18,8 +20,11 @@ public class AddRepositoryActivity extends Activity {
     public final static int RESULT_SUCCESS_ADDED = 2;
     private TextView urlTextView;
     private TextView aliasTextView;
+    private Button okButton;
+    private ProgressBar progressBar;
     private DaoSession daoSession;
     private RepositoryDao repositoryDao;
+    private DownloadXmlAsyncTask asyncTask;
 
 
     @Override
@@ -28,6 +33,8 @@ public class AddRepositoryActivity extends Activity {
         setContentView(R.layout.activity_add_repository);
         urlTextView = (TextView) findViewById(R.id.repository_url);
         aliasTextView = (TextView) findViewById(R.id.repository_alias);
+        okButton = (Button) findViewById(R.id.ok);
+        progressBar = (ProgressBar) findViewById(R.id.repository_progressbar);
         daoSession = DatabaseHelper.getInstance(this, true).getDaoSession();
         repositoryDao = daoSession.getRepositoryDao();
 
@@ -42,7 +49,12 @@ public class AddRepositoryActivity extends Activity {
     }
 
     public void cancel(View v) {
-        finish();
+        if (asyncTask == null || asyncTask.isCancelled()) {
+            finish();
+        } else {
+            asyncTask.cancel(false);
+        }
+
     }
 
     public void confirm(View v) {
@@ -74,18 +86,56 @@ public class AddRepositoryActivity extends Activity {
         int order = 100;
         if (topRepository != null)
             order = topRepository.getOrder() - 10;
+        final Repository repository = new Repository(null, url, alias, false, order, null);
 
-        Repository repository = new Repository(null, url, alias, false, order, null);
-        new DownloadXmlAsyncTask(this, daoSession) {
+        urlTextView.setEnabled(false);
+        aliasTextView.setEnabled(false);
+        okButton.setEnabled(false);
+
+        asyncTask = new DownloadXmlAsyncTask(this, daoSession) {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressBar.setProgress(0);
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+                progressBar.setProgress(values[0]);
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
             @Override
             protected void onPostExecute(Integer result) {
                 super.onPostExecute(result);
-                if (R.string.download_success == result) {
+                if (result == DownloadXmlAsyncTask.RESULT_SUCCESS) {
                     setResult(RESULT_SUCCESS_ADDED);
                     finish();
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    allowEdit();
                 }
             }
-        }.execute(repository);
+
+            @Override
+            protected void onCancelled(Integer result) {
+                super.onCancelled(result);
+                if (result != DownloadXmlAsyncTask.RESULT_CANCELLED)
+                    return;
+                repository.delete();
+                progressBar.setVisibility(View.GONE);
+                allowEdit();
+            }
+        };
+        asyncTask.execute(repository);
+    }
+
+    private void allowEdit() {
+        urlTextView.setEnabled(true);
+        aliasTextView.setEnabled(true);
+        okButton.setEnabled(true);
     }
 
     @Override

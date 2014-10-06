@@ -56,11 +56,11 @@ public class RepositoryXmlLoader {
     public void loadToDatabase(final Repository repository, Reader xmlReader)
             throws Exception {
         updateDate = new Date();
-        // Insert it into database only when the repository is new one, i.e. ID is null.
-        if (repository.getId() == null) {
+        if (repository.getLastUpdateDate() == null)
             repository.setLastUpdateDate(updateDate);
+        // Insert it into database only when the repository is new one, i.e. ID is null.
+        if (repository.getId() == null)
             repositoryDao.insert(repository);
-        }
         final XmlPullParser parser = Xml.newPullParser();
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         parser.setInput(xmlReader);
@@ -73,7 +73,7 @@ public class RepositoryXmlLoader {
                     loadRepository(repository, parser);
                 } catch (Exception e) {
                     // Delete all things if the repository is new one.
-                    // Otherwise keep all things to prevent lost usage information.
+                    // Otherwise keep all things to prevent lost usage statistics.
                     if (repository.getLastUpdateDate().equals(updateDate)) {
                         entryDao.queryBuilder()
                                 .where(EntryDao.Properties.LastUpdateDate.eq(updateDate))
@@ -82,15 +82,6 @@ public class RepositoryXmlLoader {
                                 .where(CategoryDao.Properties.LastUpdateDate.eq(updateDate))
                                 .buildDelete().executeDeleteWithoutDetachingEntities();
                         repository.delete();
-                    }
-                    // Delete all outdated items.
-                    if (!repository.getLastUpdateDate().equals(updateDate)) {
-                        entryDao.queryBuilder()
-                                .where(EntryDao.Properties.LastUpdateDate.notEq(updateDate))
-                                .buildDelete().executeDeleteWithoutDetachingEntities();
-                        categoryDao.queryBuilder()
-                                .where(CategoryDao.Properties.LastUpdateDate.notEq(updateDate))
-                                .buildDelete().executeDeleteWithoutDetachingEntities();
                     }
                     throw e;
                 }

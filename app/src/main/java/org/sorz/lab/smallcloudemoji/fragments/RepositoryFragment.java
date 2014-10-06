@@ -46,7 +46,7 @@ public class RepositoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_repository, container, false);
-        listView = (ListView) view.findViewById(android.R.id.list);
+        listView = (ListView) view.findViewById(R.id.repository_list);
         listView.setAdapter(adapter);
         return view;
     }

@@ -73,6 +73,15 @@
 
         </LinearLayout>
 
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/repository_progressbar"
+            android:max="100"
+            android:layout_below="@+id/repository_url"
+            android:visibility="gone" />
+
     </RelativeLayout>
 
 </FrameLayout>

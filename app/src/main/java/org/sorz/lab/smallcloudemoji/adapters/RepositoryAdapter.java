@@ -95,6 +95,7 @@ public class RepositoryAdapter extends BaseAdapter {
         else
             hiddenButton.setBackgroundResource(R.drawable.ic_eye_normal);
         convertView.findViewById(R.id.repository_buttons).setTag(repository);
+        convertView.findViewById(R.id.repository_progressbar).setVisibility(View.GONE);
         return convertView;
     }
 

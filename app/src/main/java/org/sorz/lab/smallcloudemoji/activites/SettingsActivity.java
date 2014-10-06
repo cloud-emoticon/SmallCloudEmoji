@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 
 import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Category;
@@ -168,13 +169,49 @@ public class SettingsActivity extends Activity implements
 
     private boolean moreMenuItemClicked(int itemId, Repository repository) {
         if (itemId == R.id.menu_repository_sync) {
-            new DownloadXmlAsyncTask(this, daoSession).execute(repository);
+            syncRepository(repository);
         } else if (itemId == R.id.menu_repository_rename) {
             renameRepository(repository);
         } else if (itemId == R.id.menu_repository_delete) {
             deleteRepositoryIfConfirmed(repository);
         }
         return true;
+    }
+
+    private void syncRepository(final Repository repository) {
+        View itemView =
+                (View) findViewById(R.id.repository_list).findViewWithTag(repository).getParent();
+        final ProgressBar progressBar =
+                (ProgressBar) itemView.findViewById(R.id.repository_progressbar);
+        new DownloadXmlAsyncTask(this, daoSession) {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressBar.setProgress(0);
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+                progressBar.setProgress(values[0]);
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            protected void onPostExecute(Integer result) {
+                super.onPostExecute(result);
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            protected void onCancelled(Integer result) {
+                super.onCancelled(result);
+                if (result != DownloadXmlAsyncTask.RESULT_CANCELLED)
+                    return;
+                progressBar.setVisibility(View.GONE);
+            }
+        }.execute(repository);
     }
 
     private void renameRepository(final Repository repository) {

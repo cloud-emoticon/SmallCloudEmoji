@@ -6,7 +6,7 @@
     tools:context="org.sorz.lab.smallcloudemoji.fragments.RepositoryFragment">
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/repository_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

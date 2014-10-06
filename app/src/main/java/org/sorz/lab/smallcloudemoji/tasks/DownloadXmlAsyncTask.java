@@ -2,9 +2,11 @@ package org.sorz.lab.smallcloudemoji.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import com.google.common.io.CountingInputStream;
 
+import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;
@@ -30,14 +32,14 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
     private Context context;
     private DaoSession daoSession;
 
-    static final int RESULT_CANCELLED = -1;
-    static final int RESULT_SUCCESS = 0;
-    static final int RESULT_ERROR_MALFORMED_URL = 1;
-    static final int RESULT_ERROR_IO = 2;
-    static final int RESULT_ERROR_XML_PARSER = 3;
-    static final int RESULT_ERROR_UNKNOWN = 4;
-    static final int RESULT_ERROR_NOT_FOUND = 5;
-    static final int RESULT_ERROR_OTHER_HTTP = 6;
+    protected static final int RESULT_CANCELLED = -1;
+    protected static final int RESULT_SUCCESS = 0;
+    protected static final int RESULT_ERROR_MALFORMED_URL = 1;
+    protected static final int RESULT_ERROR_IO = 2;
+    protected static final int RESULT_ERROR_XML_PARSER = 3;
+    protected static final int RESULT_ERROR_UNKNOWN = 4;
+    protected static final int RESULT_ERROR_NOT_FOUND = 5;
+    protected static final int RESULT_ERROR_OTHER_HTTP = 6;
 
 
     public DownloadXmlAsyncTask(Context context, DaoSession daoSession) {
@@ -116,6 +118,36 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
                 connection.disconnect();
         }
         return RESULT_SUCCESS;
+    }
+
+    @Override
+    protected void onCancelled(Integer result) {
+        super.onCancelled(result);
+        if (result != DownloadXmlAsyncTask.RESULT_CANCELLED)
+            onPostExecute(result);
+    }
+
+    @Override
+    protected void onPostExecute(Integer result) {
+        super.onPostExecute(result);
+        if (result == RESULT_SUCCESS) {
+            Toast.makeText(context, R.string.download_success, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String message = context.getString(R.string.download_fail);
+        if (result == RESULT_ERROR_MALFORMED_URL)
+            message = String.format(message, context.getString(R.string.download_malformed_url));
+        else if (result == RESULT_ERROR_IO)
+            message = String.format(message, context.getString(R.string.download_io_exception));
+        else if (result == RESULT_ERROR_NOT_FOUND)
+            message = String.format(message, context.getString(R.string.download_no_found));
+        else if (result == RESULT_ERROR_XML_PARSER)
+            message = String.format(message, context.getString(R.string.download_file_parser_error));
+        else if (result == RESULT_ERROR_OTHER_HTTP)
+            message = String.format(message, context.getString(R.string.download_http_error));
+        else
+            message = String.format(message, context.getString(R.string.download_unknown_error));
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
 }
