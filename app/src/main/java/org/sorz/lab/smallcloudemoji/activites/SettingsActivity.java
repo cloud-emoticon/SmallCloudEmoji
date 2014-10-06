@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -90,7 +91,11 @@ public class SettingsActivity extends Activity implements
                     getFragmentManager().getBackStackEntryCount() > 0);
     }
 
-    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+        @Override
     public void onSourceManageClick() {
         FragmentManager fragmentManager = getFragmentManager();
         Fragment settingsFragment = fragmentManager.findFragmentById(R.id.settings_frag);
