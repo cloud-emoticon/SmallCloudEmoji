@@ -1,14 +1,10 @@
 package org.sorz.lab.smallcloudemoji.tasks;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.google.common.io.CountingInputStream;
 
-import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;
@@ -33,33 +29,21 @@ import java.net.URL;
 public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
     private Context context;
     private DaoSession daoSession;
-    private ProgressDialog progressDialog;
 
-    private static final int CANCELLED = -1;
+    static final int RESULT_CANCELLED = -1;
+    static final int RESULT_SUCCESS = 0;
+    static final int RESULT_ERROR_MALFORMED_URL = 1;
+    static final int RESULT_ERROR_IO = 2;
+    static final int RESULT_ERROR_XML_PARSER = 3;
+    static final int RESULT_ERROR_UNKNOWN = 4;
+    static final int RESULT_ERROR_NOT_FOUND = 5;
+    static final int RESULT_ERROR_OTHER_HTTP = 6;
+
 
     public DownloadXmlAsyncTask(Context context, DaoSession daoSession) {
         super();
         this.context = context;
         this.daoSession = daoSession;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle(R.string.download_title);
-        progressDialog.setMessage(context.getString(R.string.download_message));
-        progressDialog.setMax(100);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setCancelable(true);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                cancel(true);
-            }
-        });
-        progressDialog.show();
     }
 
     @Override
@@ -79,13 +63,13 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
                         statusCode == HttpURLConnection.HTTP_MOVED_PERM) {
                     url = connection.getURL();
                 } else if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                    return R.string.download_no_found;
+                    return RESULT_ERROR_NOT_FOUND;
                 } else {
-                    return R.string.download_http_error;
+                    return RESULT_ERROR_OTHER_HTTP;
                 }
             }
             if (connection == null)
-                return R.string.download_http_error;
+                return RESULT_ERROR_OTHER_HTTP;
             final int fileLength = connection.getContentLength();
             final CountingInputStream counting = new CountingInputStream(connection.getInputStream());
             inputStream = counting;
@@ -111,16 +95,16 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
             xmlLoader.loadToDatabase(repository,
                     new BufferedReader(new InputStreamReader(inputStream)));
         } catch (LoadingCancelException e) {
-            return CANCELLED;
+            return RESULT_CANCELLED;
         } catch (MalformedURLException e) {
-            return R.string.download_malformed_url;
+            return RESULT_ERROR_MALFORMED_URL;
         } catch (IOException e) {
-            return R.string.download_io_exception;
+            return RESULT_ERROR_IO;
         } catch (XmlPullParserException e) {
-            return R.string.download_file_parser_error;
+            return RESULT_ERROR_XML_PARSER;
         } catch (Exception e) {
             e.printStackTrace();
-            return R.string.download_unknown_error;
+            return RESULT_ERROR_UNKNOWN;
         } finally {
             try {
                 if (inputStream != null)
@@ -131,36 +115,7 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
             if (connection != null)
                 connection.disconnect();
         }
-        return R.string.download_success;
+        return RESULT_SUCCESS;
     }
 
-    @Override
-    protected void onProgressUpdate(Integer... value) {
-        super.onProgressUpdate(value);
-        progressDialog.setIndeterminate(false);
-        progressDialog.setProgress(value[0]);
-
-    }
-
-    @Override
-    protected void onPostExecute(Integer result) {
-        progressDialog.dismiss();
-        if (R.string.download_success == result) {
-            Toast.makeText(context, R.string.download_success, Toast.LENGTH_SHORT).show();
-        } else {
-            String message = String.format(
-                    context.getString(R.string.download_fail),
-                    context.getString(result));
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onCancelled(Integer result) {
-        if (result != CANCELLED) {
-            onPostExecute(result);
-        } else {
-            progressDialog.dismiss();
-        }
-    }
 }
