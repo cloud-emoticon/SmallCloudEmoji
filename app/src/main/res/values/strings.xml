@@ -53,4 +53,5 @@
     <string name="menu_repository_sync">Sync</string>
     <string name="menu_repository_rename">Rename</string>
     <string name="repository_rename_title">New alias</string>
+    <string name="toast_repository_copied">Repository URL copied.</string>
 </resources>

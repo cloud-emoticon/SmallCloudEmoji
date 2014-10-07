@@ -8,7 +8,12 @@
     <ListView
         android:id="@+id/repository_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:paddingTop="5dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:clickable="true"
+        android:longClickable="true" />
 
     <TextView
         android:id="@android:id/empty"

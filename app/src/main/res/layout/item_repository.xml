@@ -11,7 +11,8 @@
         android:background="@drawable/card_background"
         android:layout_marginLeft="8pt"
         android:layout_marginRight="8pt"
-        android:layout_marginTop="5pt"
+        android:layout_marginTop="3pt"
+        android:layout_marginBottom="3pt"
         android:padding="5pt">
 
         <TextView
@@ -39,6 +40,7 @@
             android:orientation="horizontal"
             android:id="@+id/repository_buttons"
             android:layout_alignParentTop="true"
+            android:descendantFocusability="blocksDescendants"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" >
 

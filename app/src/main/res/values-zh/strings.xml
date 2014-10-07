@@ -51,4 +51,5 @@
     <string name="menu_repository_sync">同步</string>
     <string name="menu_repository_rename">重命名</string>
     <string name="repository_rename_title">新别名</string>
+    <string name="toast_repository_copied">链接已复制</string>
 </resources>
