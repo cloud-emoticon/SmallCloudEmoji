@@ -118,10 +118,9 @@ public class MainApplication extends SmallApplication {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Object tag = view.getTag();
-                if (!(tag instanceof Entry))
+                Entry entry = (Entry) view.getTag(R.id.entry);
+                if (entry == null)
                     return false;
-                Entry entry = (Entry) tag;
                 entry.setStar(!entry.getStar());
                 entry.update();
                 adapter.notifyDataSetChanged();

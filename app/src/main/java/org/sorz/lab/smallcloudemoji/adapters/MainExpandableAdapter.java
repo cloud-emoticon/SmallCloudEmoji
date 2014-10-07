@@ -130,9 +130,9 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
             viewHolder = new GroupViewHolder();
             viewHolder.category = (TextView) convertView.findViewById(android.R.id.text1);
             viewHolder.repository = (TextView) convertView.findViewById(android.R.id.text2);
-            convertView.setTag(viewHolder);
+            convertView.setTag(R.id.view_holder, viewHolder);
         } else {
-            viewHolder = (GroupViewHolder) convertView.getTag();
+            viewHolder = (GroupViewHolder) convertView.getTag(R.id.view_holder);
         }
         Category category = getGroup(groupPosition);
 
@@ -159,11 +159,12 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
             viewHolder.emoticon = (TextView) convertView.findViewById(R.id.text1);
             viewHolder.description = (TextView) convertView.findViewById(R.id.text2);
             viewHolder.star = convertView.findViewById(R.id.star);
-            convertView.setTag(viewHolder);
+            convertView.setTag(R.id.view_holder, viewHolder);
         } else {
-            viewHolder = (ChildViewHolder) convertView.getTag();
+            viewHolder = (ChildViewHolder) convertView.getTag(R.id.view_holder);
         }
         Entry entry = getChild(groupPosition, childPosition);
+        convertView.setTag(R.id.entry, entry);
         viewHolder.emoticon.setText(entry.getEmoticon());
         if (showNote && !entry.getDescription().isEmpty()) {
             viewHolder.description.setText(entry.getDescription());
