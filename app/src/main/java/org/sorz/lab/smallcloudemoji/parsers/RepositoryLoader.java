@@ -30,6 +30,7 @@ public abstract class RepositoryLoader {
     private EntryDao entryDao;
 
     private Date updateDate;
+    private boolean isNewRepository;
     private RepositoryLoaderEventListener eventListener;
 
     private Repository currentRepository;
@@ -41,7 +42,6 @@ public abstract class RepositoryLoader {
         this.eventListener = eventListener;
     }
 
-
     public RepositoryLoader(DaoSession daoSession) {
         this.daoSession = daoSession;
         repositoryDao = daoSession.getRepositoryDao();
@@ -51,8 +51,10 @@ public abstract class RepositoryLoader {
 
     public void loadToDatabase(Repository repository, final Reader reader) throws Exception {
         updateDate = new Date();
-        if (repository.getLastUpdateDate() == null)
+        if (repository.getLastUpdateDate() == null) {
             repository.setLastUpdateDate(updateDate);
+            isNewRepository = true;
+        }
         // Insert it into database only when the repository is new one, i.e. ID is null.
         if (repository.getId() == null)
             repositoryDao.insert(repository);
@@ -66,16 +68,33 @@ public abstract class RepositoryLoader {
                 } catch (Exception e) {
                     // Delete all things if the repository is new one.
                     // Otherwise keep all things to prevent lost usage statistics.
-                    if (currentRepository.getLastUpdateDate().equals(updateDate)) {
+                    if (isNewRepository) {
                         entryDao.queryBuilder()
-                                .where(EntryDao.Properties.LastUpdateDate.eq(updateDate))
+                                .where(EntryDao.Properties.LastUpdateDate.eq(updateDate),
+                                        EntryDao.Properties.CategoryId.in(
+                                                getCategoryIds(currentRepository)))
                                 .buildDelete().executeDeleteWithoutDetachingEntities();
                         categoryDao.queryBuilder()
-                                .where(CategoryDao.Properties.LastUpdateDate.eq(updateDate))
+                                .where(CategoryDao.Properties.LastUpdateDate.eq(updateDate),
+                                        CategoryDao.Properties.RepositoryId.eq(
+                                                currentRepository.getId()))
                                 .buildDelete().executeDeleteWithoutDetachingEntities();
                         currentRepository.delete();
                     }
                     throw e;
+                }
+                // If update old one successfully, delete all old things.
+                if (!isNewRepository) {
+                    entryDao.queryBuilder()
+                            .where(EntryDao.Properties.LastUpdateDate.notEq(updateDate),
+                                    EntryDao.Properties.CategoryId.in(
+                                            getCategoryIds(currentRepository)))
+                            .buildDelete().executeDeleteWithoutDetachingEntities();
+                    categoryDao.queryBuilder()
+                            .where(CategoryDao.Properties.LastUpdateDate.notEq(updateDate),
+                                    CategoryDao.Properties.RepositoryId.eq(
+                                            currentRepository.getId()))
+                            .buildDelete().executeDeleteWithoutDetachingEntities();
                 }
                 return null;
             }
@@ -100,7 +119,7 @@ public abstract class RepositoryLoader {
         Category category = null;
         // Try to get category from database first
         // if the repository which it belong to is not new added one.
-        if (!currentRepository.getLastUpdateDate().equals(updateDate)) {
+        if (!isNewRepository) {
             category = categoryDao.queryBuilder()
                     .where(CategoryDao.Properties.RepositoryId.eq(currentRepository.getId()),
                             CategoryDao.Properties.Name.eq(name))
@@ -151,7 +170,7 @@ public abstract class RepositoryLoader {
     protected void endCategory() {
         List<Entry> updateEntries = new ArrayList<Entry>();
         List<Entry> insertEntries = new ArrayList<Entry>();
-        if (!currentCategory.getLastUpdateDate().equals(updateDate)) {
+        if (!isNewRepository) {
             List<Entry> oldEntries = entryDao.queryBuilder()
                     .where(EntryDao.Properties.CategoryId.eq(currentCategory.getId()))
                     .list();
@@ -189,5 +208,14 @@ public abstract class RepositoryLoader {
 
     protected abstract void loadRepository(Reader reader)
             throws PullParserException, IOException, LoadingCancelException;
+
+
+    private List<Long> getCategoryIds(Repository repository) {
+        List<Category> categories = repository.getCategories();
+        List<Long> categoryIds = new ArrayList<Long>(categories.size());
+        for (Category category : categories)
+            categoryIds.add(category.getId());
+        return categoryIds;
+    }
 
 }

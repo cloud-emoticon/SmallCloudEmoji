@@ -1,8 +1,10 @@
 package org.sorz.lab.smallcloudemoji;
 
 
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -22,7 +24,9 @@ import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.db.Entry;
+import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
 import org.sorz.lab.smallcloudemoji.tasks.DownloadAsyncTask;
 
 import java.util.Date;
@@ -53,23 +57,17 @@ public class MainApplication extends SmallApplication {
         // Open database.
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this, true);
         daoSession = databaseHelper.getDaoSession();
+        EntryDao entryDao = daoSession.getEntryDao();
+        RepositoryDao repositoryDao = daoSession.getRepositoryDao();
         DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
-        final Repository repository = databaseHelper.getDefaultRepository();
-
 
         // Download if it's empty.
-        if (repository.getCategories().isEmpty()) {
+        if (entryDao.queryBuilder().limit(1).count() == 0) {
+            Repository repository = repositoryDao.queryBuilder().limit(1).unique();
             // Minimize the windows rather than mask the process dialog.
             getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
-            new DownloadAsyncTask(this, daoSession) {
-                @Override
-                protected void onPostExecute(Integer result) {
-                    super.onPostExecute(result);
-                    repository.resetCategories();
-                    adapter.notifyDataSetChanged(true);
-                    getWindow().setWindowState(SmallAppWindow.WindowState.NORMAL);
-                }
-            }.execute(repository);
+            updateRepository(repository);
+
         }
 
         final ExpandableListView listView =
@@ -147,6 +145,48 @@ public class MainApplication extends SmallApplication {
     public void onDestroy() {
         super.onDestroy();
         DatabaseHelper.getInstance(this).close();
+    }
+
+    private void updateRepository(final Repository repository) {
+        new DownloadAsyncTask(this, daoSession) {
+            private ProgressDialog progressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressDialog = new ProgressDialog(MainApplication.this);
+                progressDialog.setTitle(R.string.download_title);
+                progressDialog.setMessage(getString(R.string.download_message));
+                progressDialog.setMax(100);
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setCancelable(true);
+                progressDialog.setCanceledOnTouchOutside(false);
+                progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        cancel(true);
+                    }
+                });
+                progressDialog.show();
+            }
+
+            @Override
+            protected void onPostExecute(Integer result) {
+                super.onPostExecute(result);
+                progressDialog.dismiss();
+                repository.resetCategories();
+                adapter.notifyDataSetChanged(true);
+                getWindow().setWindowState(SmallAppWindow.WindowState.NORMAL);
+            }
+
+            @Override
+            protected void onCancelled(Integer result) {
+                super.onCancelled();
+                if (result == DownloadAsyncTask.RESULT_SUCCESS)
+                    return;
+                progressDialog.dismiss();
+            }
+        }.execute(repository);
     }
 
 }

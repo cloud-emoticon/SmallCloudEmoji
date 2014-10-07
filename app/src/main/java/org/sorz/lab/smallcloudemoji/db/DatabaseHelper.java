@@ -1,23 +1,19 @@
 package org.sorz.lab.smallcloudemoji.db;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.preference.PreferenceManager;
 
 import org.sorz.lab.smallcloudemoji.R;
 
-import java.util.Date;
 
 /**
- * Created by xierch on 2014/9/16.
+ * A singleton class to open database.
  */
 public class DatabaseHelper {
     private static DatabaseHelper ourInstance;
     private static int userCounter = 0;
     private DaoMaster daoMaster;
     private DaoSession daoSession;
-    private Repository defaultRepository;
 
     public static DatabaseHelper getInstance(Context context) {
         return getInstance(context, false);
@@ -37,24 +33,15 @@ public class DatabaseHelper {
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
 
-        defaultRepository = daoSession.getRepositoryDao().queryBuilder()
-                .where(RepositoryDao.Properties.Alias.eq("Default"))
-                .limit(1).unique();
-        if (defaultRepository == null) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String sourceUrl = preferences.getString("sync_source",
-                    context.getResources().getString(R.string.pref_source_address_default));
-            defaultRepository = new Repository(null, sourceUrl, "Default", false, 100, new Date());
-            daoSession.getRepositoryDao().insert(defaultRepository);
+        if (daoSession.getRepositoryDao().queryBuilder().count() == 0) {
+            String sourceUrl = context.getString(R.string.pref_source_address_default);
+            Repository repository = new Repository(null, sourceUrl, "Default", false, 100, null);
+            daoSession.getRepositoryDao().insert(repository);
         }
     }
 
     public DaoSession getDaoSession() {
         return daoSession;
-    }
-
-    public Repository getDefaultRepository() {
-        return defaultRepository;
     }
 
     public void close() {
