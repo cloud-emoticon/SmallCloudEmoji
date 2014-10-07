@@ -13,7 +13,7 @@ import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
-import org.sorz.lab.smallcloudemoji.tasks.DownloadXmlAsyncTask;
+import org.sorz.lab.smallcloudemoji.tasks.DownloadAsyncTask;
 
 
 public class AddRepositoryActivity extends Activity {
@@ -24,7 +24,7 @@ public class AddRepositoryActivity extends Activity {
     private ProgressBar progressBar;
     private DaoSession daoSession;
     private RepositoryDao repositoryDao;
-    private DownloadXmlAsyncTask asyncTask;
+    private DownloadAsyncTask asyncTask;
 
 
     @Override
@@ -92,7 +92,7 @@ public class AddRepositoryActivity extends Activity {
         aliasTextView.setEnabled(false);
         okButton.setEnabled(false);
 
-        asyncTask = new DownloadXmlAsyncTask(this, daoSession) {
+        asyncTask = new DownloadAsyncTask(this, daoSession) {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -110,7 +110,7 @@ public class AddRepositoryActivity extends Activity {
             @Override
             protected void onPostExecute(Integer result) {
                 super.onPostExecute(result);
-                if (result == DownloadXmlAsyncTask.RESULT_SUCCESS) {
+                if (result == DownloadAsyncTask.RESULT_SUCCESS) {
                     setResult(RESULT_SUCCESS_ADDED);
                     finish();
                 } else {
@@ -122,7 +122,7 @@ public class AddRepositoryActivity extends Activity {
             @Override
             protected void onCancelled(Integer result) {
                 super.onCancelled(result);
-                if (result != DownloadXmlAsyncTask.RESULT_CANCELLED)
+                if (result != DownloadAsyncTask.RESULT_CANCELLED)
                     return;
                 repository.delete();
                 progressBar.setVisibility(View.GONE);

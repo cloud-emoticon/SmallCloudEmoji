@@ -12,6 +12,8 @@ import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.sorz.lab.smallcloudemoji.exceptions.LoadingCancelException;
+import org.sorz.lab.smallcloudemoji.parsers.RepositoryJsonLoader;
+import org.sorz.lab.smallcloudemoji.parsers.RepositoryLoader;
 import org.sorz.lab.smallcloudemoji.parsers.RepositoryLoaderEventListener;
 import org.sorz.lab.smallcloudemoji.parsers.RepositoryXmlLoader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -28,7 +30,7 @@ import java.net.URL;
 /**
  * Download and save a XML file.
  */
-public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
+public class DownloadAsyncTask extends AsyncTask<Repository, Integer, Integer> {
     private Context context;
     private DaoSession daoSession;
 
@@ -40,9 +42,10 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
     protected static final int RESULT_ERROR_UNKNOWN = 4;
     protected static final int RESULT_ERROR_NOT_FOUND = 5;
     protected static final int RESULT_ERROR_OTHER_HTTP = 6;
+    protected static final int RESULT_ERROR_UNSUPPORTED_FORMAT = 7;
 
 
-    public DownloadXmlAsyncTask(Context context, DaoSession daoSession) {
+    public DownloadAsyncTask(Context context, DaoSession daoSession) {
         super();
         this.context = context;
         this.daoSession = daoSession;
@@ -76,8 +79,17 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
             final CountingInputStream counting = new CountingInputStream(connection.getInputStream());
             inputStream = counting;
 
-            RepositoryXmlLoader xmlLoader = new RepositoryXmlLoader(daoSession);
-            xmlLoader.setLoaderEventListener(new RepositoryLoaderEventListener() {
+            RepositoryLoader repositoryLoader;
+            String contentType = connection.getContentType();
+            String filename = connection.getURL().getFile().toLowerCase();
+            if (contentType.startsWith("text/xml") || filename.endsWith(".xml"))
+                repositoryLoader = new RepositoryXmlLoader(daoSession);
+            else if (contentType.startsWith("application/json") || filename.endsWith(".json"))
+                repositoryLoader = new RepositoryJsonLoader(daoSession);
+            else
+                return RESULT_ERROR_UNSUPPORTED_FORMAT;
+
+            repositoryLoader.setLoaderEventListener(new RepositoryLoaderEventListener() {
                 private long lastUpdateProcess;
 
                 public boolean onLoadingCategory(Category category) {
@@ -94,7 +106,7 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
                     return isCancelled();
                 }
             });
-            xmlLoader.loadToDatabase(repository,
+            repositoryLoader.loadToDatabase(repository,
                     new BufferedReader(new InputStreamReader(inputStream)));
         } catch (LoadingCancelException e) {
             return RESULT_CANCELLED;
@@ -123,7 +135,7 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
     @Override
     protected void onCancelled(Integer result) {
         super.onCancelled(result);
-        if (result != DownloadXmlAsyncTask.RESULT_CANCELLED)
+        if (result != DownloadAsyncTask.RESULT_CANCELLED)
             onPostExecute(result);
     }
 
@@ -145,6 +157,8 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
             message = String.format(message, context.getString(R.string.download_file_parser_error));
         else if (result == RESULT_ERROR_OTHER_HTTP)
             message = String.format(message, context.getString(R.string.download_http_error));
+        else if (result == RESULT_ERROR_UNSUPPORTED_FORMAT)
+            message = String.format(message, context.getString(R.string.download_unsupported));
         else
             message = String.format(message, context.getString(R.string.download_unknown_error));
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();

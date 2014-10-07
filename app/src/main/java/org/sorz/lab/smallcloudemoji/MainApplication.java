@@ -23,7 +23,7 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
-import org.sorz.lab.smallcloudemoji.tasks.DownloadXmlAsyncTask;
+import org.sorz.lab.smallcloudemoji.tasks.DownloadAsyncTask;
 
 import java.util.Date;
 
@@ -61,7 +61,7 @@ public class MainApplication extends SmallApplication {
         if (repository.getCategories().isEmpty()) {
             // Minimize the windows rather than mask the process dialog.
             getWindow().setWindowState(SmallAppWindow.WindowState.MINIMIZED);
-            new DownloadXmlAsyncTask(this, daoSession) {
+            new DownloadAsyncTask(this, daoSession) {
                 @Override
                 protected void onPostExecute(Integer result) {
                     super.onPostExecute(result);

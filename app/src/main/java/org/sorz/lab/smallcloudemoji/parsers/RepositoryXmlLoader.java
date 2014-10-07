@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 
-public class RepositoryXmlLoader extends AbstractRepositoryLoader {
+public class RepositoryXmlLoader extends RepositoryLoader {
     private static final String ns = null;
 
     public RepositoryXmlLoader(DaoSession daoSession) {

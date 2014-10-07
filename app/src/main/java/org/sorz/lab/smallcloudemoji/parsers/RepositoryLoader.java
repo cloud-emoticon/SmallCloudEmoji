@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
  * Parse a stream into one repository, and add it into database.
  * The abstract class implements all database-related methods, but not parser-related methods.
  */
-abstract class AbstractRepositoryLoader {
+public abstract class RepositoryLoader {
     private DaoSession daoSession;
     private RepositoryDao repositoryDao;
     private CategoryDao categoryDao;
@@ -42,7 +42,7 @@ abstract class AbstractRepositoryLoader {
     }
 
 
-    public AbstractRepositoryLoader(DaoSession daoSession) {
+    public RepositoryLoader(DaoSession daoSession) {
         this.daoSession = daoSession;
         repositoryDao = daoSession.getRepositoryDao();
         categoryDao = daoSession.getCategoryDao();
@@ -89,12 +89,14 @@ abstract class AbstractRepositoryLoader {
     /**
      * Add a category to database,
      * and all entries will be added to this category before endCategory called.
-     * Must be called in the beginning of parsing category.
+     * Must be called before endCategory() called.
      * @param name The name of category.
      * @throws LoadingCancelException Loading canceled via LoaderEventListener.
      */
     protected void beginCategory(String name)
             throws LoadingCancelException {
+        if (currentCategory != null)
+            endCategory();
         Category category = null;
         // Try to get category from database first
         // if the repository which it belong to is not new added one.
@@ -113,12 +115,16 @@ abstract class AbstractRepositoryLoader {
             if (eventListener.onLoadingCategory(category))
                 throw new LoadingCancelException();
         currentCategory = category;
-        currentEntries = new ArrayList<Entry>();
+        if (currentEntries != null) {
+            for (Entry entry : currentEntries)
+                entry.setCategory(currentCategory);
+        } else {
+            currentEntries = new ArrayList<Entry>();
+        }
     }
 
     /**
      * Add a entry to buffer.
-     * Important: this method must be call between beginCategory() called and endCategory() called.
      * @param emoticon Emoticon string.
      * @param description Optional description string.
      * @throws LoadingCancelException Loading canceled via LoaderEventListener.
@@ -126,8 +132,11 @@ abstract class AbstractRepositoryLoader {
     protected void addEntry(String emoticon, String description) throws LoadingCancelException {
         if (description == null)
             description = "";
-        Entry entry = new Entry(null, emoticon, description, false, null,
-                updateDate, currentCategory.getId());
+        if (currentEntries == null)
+            currentEntries = new ArrayList<Entry>();
+        // Category will be set later when beginCategory() called if it's unknown now.
+        Long categoryId = currentCategory == null ? null : currentCategory.getId();
+        Entry entry = new Entry(null, emoticon, description, false, null, updateDate, categoryId);
         currentEntries.add(entry);
         if (eventListener != null)
             if (eventListener.onEntryLoaded(entry))

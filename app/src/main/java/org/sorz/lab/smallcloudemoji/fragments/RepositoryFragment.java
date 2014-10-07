@@ -33,7 +33,7 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
-import org.sorz.lab.smallcloudemoji.tasks.DownloadXmlAsyncTask;
+import org.sorz.lab.smallcloudemoji.tasks.DownloadAsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,7 +208,7 @@ public class RepositoryFragment extends Fragment {
                 .findViewWithTag(repository).getParent();
         final ProgressBar progressBar =
                 (ProgressBar) itemView.findViewById(R.id.repository_progressbar);
-        new DownloadXmlAsyncTask(context, daoSession) {
+        new DownloadAsyncTask(context, daoSession) {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -232,7 +232,7 @@ public class RepositoryFragment extends Fragment {
             @Override
             protected void onCancelled(Integer result) {
                 super.onCancelled(result);
-                if (result != DownloadXmlAsyncTask.RESULT_CANCELLED)
+                if (result != DownloadAsyncTask.RESULT_CANCELLED)
                     return;
                 progressBar.setVisibility(View.GONE);
             }
