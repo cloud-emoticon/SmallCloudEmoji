@@ -98,7 +98,7 @@ public class MainApplication extends SmallApplication {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                         int childPosition, long id) {
-                Entry entry = (Entry) v.getTag();
+                Entry entry = adapter.getChild(groupPosition, childPosition);
                 ClipboardManager clipboard =
                         (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 ClipData clipData = ClipData.newPlainText("emoticon", entry.getEmoticon());
