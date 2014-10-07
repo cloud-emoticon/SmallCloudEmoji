@@ -20,6 +20,17 @@
         android:layout_gravity="center_horizontal"
         android:hint="@string/hint_repository_alias" />
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:id="@+id/repository_progressbar"
+        android:max="100"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal" />
+
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dip"

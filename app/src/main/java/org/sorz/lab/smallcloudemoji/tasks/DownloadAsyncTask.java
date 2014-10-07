@@ -1,8 +1,6 @@
 package org.sorz.lab.smallcloudemoji.tasks;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -13,7 +11,9 @@ import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
-import org.sorz.lab.smallcloudemoji.parsers.LoadingCancelException;
+import org.sorz.lab.smallcloudemoji.exceptions.LoadingCancelException;
+import org.sorz.lab.smallcloudemoji.parsers.RepositoryJsonLoader;
+import org.sorz.lab.smallcloudemoji.parsers.RepositoryLoader;
 import org.sorz.lab.smallcloudemoji.parsers.RepositoryLoaderEventListener;
 import org.sorz.lab.smallcloudemoji.parsers.RepositoryXmlLoader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -30,36 +30,25 @@ import java.net.URL;
 /**
  * Download and save a XML file.
  */
-public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer> {
+public class DownloadAsyncTask extends AsyncTask<Repository, Integer, Integer> {
     private Context context;
     private DaoSession daoSession;
-    private ProgressDialog progressDialog;
 
-    private static final int CANCELLED = -1;
+    protected static final int RESULT_CANCELLED = -1;
+    protected static final int RESULT_SUCCESS = 0;
+    protected static final int RESULT_ERROR_MALFORMED_URL = 1;
+    protected static final int RESULT_ERROR_IO = 2;
+    protected static final int RESULT_ERROR_XML_PARSER = 3;
+    protected static final int RESULT_ERROR_UNKNOWN = 4;
+    protected static final int RESULT_ERROR_NOT_FOUND = 5;
+    protected static final int RESULT_ERROR_OTHER_HTTP = 6;
+    protected static final int RESULT_ERROR_UNSUPPORTED_FORMAT = 7;
 
-    public DownloadXmlAsyncTask(Context context, DaoSession daoSession) {
+
+    public DownloadAsyncTask(Context context, DaoSession daoSession) {
         super();
         this.context = context;
         this.daoSession = daoSession;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle(R.string.download_title);
-        progressDialog.setMessage(context.getString(R.string.download_message));
-        progressDialog.setMax(100);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setCancelable(true);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                cancel(true);
-            }
-        });
-        progressDialog.show();
     }
 
     @Override
@@ -79,19 +68,28 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
                         statusCode == HttpURLConnection.HTTP_MOVED_PERM) {
                     url = connection.getURL();
                 } else if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                    return R.string.download_no_found;
+                    return RESULT_ERROR_NOT_FOUND;
                 } else {
-                    return R.string.download_http_error;
+                    return RESULT_ERROR_OTHER_HTTP;
                 }
             }
             if (connection == null)
-                return R.string.download_http_error;
+                return RESULT_ERROR_OTHER_HTTP;
             final int fileLength = connection.getContentLength();
             final CountingInputStream counting = new CountingInputStream(connection.getInputStream());
             inputStream = counting;
 
-            RepositoryXmlLoader xmlLoader = new RepositoryXmlLoader(daoSession);
-            xmlLoader.setLoaderEventListener(new RepositoryLoaderEventListener() {
+            RepositoryLoader repositoryLoader;
+            String contentType = connection.getContentType();
+            String filename = connection.getURL().getFile().toLowerCase();
+            if (contentType.startsWith("text/xml") || filename.endsWith(".xml"))
+                repositoryLoader = new RepositoryXmlLoader(daoSession);
+            else if (contentType.startsWith("application/json") || filename.endsWith(".json"))
+                repositoryLoader = new RepositoryJsonLoader(daoSession);
+            else
+                return RESULT_ERROR_UNSUPPORTED_FORMAT;
+
+            repositoryLoader.setLoaderEventListener(new RepositoryLoaderEventListener() {
                 private long lastUpdateProcess;
 
                 public boolean onLoadingCategory(Category category) {
@@ -108,19 +106,19 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
                     return isCancelled();
                 }
             });
-            xmlLoader.loadToDatabase(repository,
+            repositoryLoader.loadToDatabase(repository,
                     new BufferedReader(new InputStreamReader(inputStream)));
         } catch (LoadingCancelException e) {
-            return CANCELLED;
+            return RESULT_CANCELLED;
         } catch (MalformedURLException e) {
-            return R.string.download_malformed_url;
+            return RESULT_ERROR_MALFORMED_URL;
         } catch (IOException e) {
-            return R.string.download_io_exception;
+            return RESULT_ERROR_IO;
         } catch (XmlPullParserException e) {
-            return R.string.download_file_parser_error;
+            return RESULT_ERROR_XML_PARSER;
         } catch (Exception e) {
             e.printStackTrace();
-            return R.string.download_unknown_error;
+            return RESULT_ERROR_UNKNOWN;
         } finally {
             try {
                 if (inputStream != null)
@@ -131,36 +129,39 @@ public class DownloadXmlAsyncTask extends AsyncTask<Repository, Integer, Integer
             if (connection != null)
                 connection.disconnect();
         }
-        return R.string.download_success;
-    }
-
-    @Override
-    protected void onProgressUpdate(Integer... value) {
-        super.onProgressUpdate(value);
-        progressDialog.setIndeterminate(false);
-        progressDialog.setProgress(value[0]);
-
-    }
-
-    @Override
-    protected void onPostExecute(Integer result) {
-        progressDialog.dismiss();
-        if (R.string.download_success == result) {
-            Toast.makeText(context, R.string.download_success, Toast.LENGTH_SHORT).show();
-        } else {
-            String message = String.format(
-                    context.getString(R.string.download_fail),
-                    context.getString(result));
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-        }
+        return RESULT_SUCCESS;
     }
 
     @Override
     protected void onCancelled(Integer result) {
-        if (result != CANCELLED) {
+        super.onCancelled(result);
+        if (result != DownloadAsyncTask.RESULT_CANCELLED)
             onPostExecute(result);
-        } else {
-            progressDialog.dismiss();
-        }
     }
+
+    @Override
+    protected void onPostExecute(Integer result) {
+        super.onPostExecute(result);
+        if (result == RESULT_SUCCESS) {
+            Toast.makeText(context, R.string.download_success, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String message = context.getString(R.string.download_fail);
+        if (result == RESULT_ERROR_MALFORMED_URL)
+            message = String.format(message, context.getString(R.string.download_malformed_url));
+        else if (result == RESULT_ERROR_IO)
+            message = String.format(message, context.getString(R.string.download_io_exception));
+        else if (result == RESULT_ERROR_NOT_FOUND)
+            message = String.format(message, context.getString(R.string.download_no_found));
+        else if (result == RESULT_ERROR_XML_PARSER)
+            message = String.format(message, context.getString(R.string.download_file_parser_error));
+        else if (result == RESULT_ERROR_OTHER_HTTP)
+            message = String.format(message, context.getString(R.string.download_http_error));
+        else if (result == RESULT_ERROR_UNSUPPORTED_FORMAT)
+            message = String.format(message, context.getString(R.string.download_unsupported));
+        else
+            message = String.format(message, context.getString(R.string.download_unknown_error));
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
 }

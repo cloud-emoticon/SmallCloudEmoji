@@ -42,12 +42,12 @@ public class RepositoryAdapter extends BaseAdapter {
 
     @Override
     public boolean areAllItemsEnabled() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled(int position) {
-        return false;
+        return true;
     }
 
     @Override
@@ -95,6 +95,7 @@ public class RepositoryAdapter extends BaseAdapter {
         else
             hiddenButton.setBackgroundResource(R.drawable.ic_eye_normal);
         convertView.findViewById(R.id.repository_buttons).setTag(repository);
+        convertView.findViewById(R.id.repository_progressbar).setVisibility(View.GONE);
         return convertView;
     }
 
