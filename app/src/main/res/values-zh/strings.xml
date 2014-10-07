@@ -12,6 +12,7 @@
     <string name="download_title">下载中</string>
     <string name="download_file_parser_error">文件好像坏掉了喵</string>
     <string name="download_unknown_error">下载时出现奇怪问题了喵</string>
+    <string name="download_unsupported">不支持此格式</string>
     <string name="list_title_favorite">我的收藏</string>
     <string name="list_title_options">选项</string>
     <string name="pref_about_title">关于</string>
