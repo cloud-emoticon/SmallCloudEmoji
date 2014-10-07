@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.sorz.lab.smallcloudemoji.R;
@@ -32,6 +31,17 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     private boolean showNote;
     private DaoSession daoSession;
     private List<Category> categories = new ArrayList<Category>();
+
+    private static class GroupViewHolder {
+        TextView category;
+        TextView repository;
+    }
+
+    private static class ChildViewHolder {
+        TextView emoticon;
+        TextView description;
+        View star;
+    }
 
     public MainExpandableAdapter(Context context, DaoSession daoSession) {
         super();
@@ -114,12 +124,19 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
-        Category category = getGroup(groupPosition);
-        if (convertView == null)
+        GroupViewHolder viewHolder;
+        if (convertView == null) {
             convertView = inflater.inflate(R.layout.item_group, parent, false);
-        TextView text1 = (TextView) convertView.findViewById(android.R.id.text1);
-        TextView text2 = (TextView) convertView.findViewById(android.R.id.text2);
-        text1.setText(category.getName());
+            viewHolder = new GroupViewHolder();
+            viewHolder.category = (TextView) convertView.findViewById(android.R.id.text1);
+            viewHolder.repository = (TextView) convertView.findViewById(android.R.id.text2);
+            convertView.setTag(R.id.view_holder, viewHolder);
+        } else {
+            viewHolder = (GroupViewHolder) convertView.getTag(R.id.view_holder);
+        }
+        Category category = getGroup(groupPosition);
+
+        viewHolder.category.setText(category.getName());
         String repositoryAlias;
         if (category instanceof FavoriteCategory) {
             repositoryAlias = "";
@@ -128,17 +145,34 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
             if (repositoryAlias.equals("Default"))
                 repositoryAlias = "";
         }
-        text2.setText(repositoryAlias);
+        viewHolder.repository.setText(repositoryAlias);
         return convertView;
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
-        if (convertView == null || convertView instanceof RelativeLayout)
+        ChildViewHolder viewHolder;
+        if (convertView == null) {
             convertView = inflater.inflate(R.layout.item_child, parent, false);
-        convertChildView(convertView,
-                categories.get(groupPosition).getEntries().get(childPosition));
+            viewHolder = new ChildViewHolder();
+            viewHolder.emoticon = (TextView) convertView.findViewById(R.id.text1);
+            viewHolder.description = (TextView) convertView.findViewById(R.id.text2);
+            viewHolder.star = convertView.findViewById(R.id.star);
+            convertView.setTag(R.id.view_holder, viewHolder);
+        } else {
+            viewHolder = (ChildViewHolder) convertView.getTag(R.id.view_holder);
+        }
+        Entry entry = getChild(groupPosition, childPosition);
+        convertView.setTag(R.id.entry, entry);
+        viewHolder.emoticon.setText(entry.getEmoticon());
+        if (showNote && !entry.getDescription().isEmpty()) {
+            viewHolder.description.setText(entry.getDescription());
+            viewHolder.description.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.description.setVisibility(View.GONE);
+        }
+        viewHolder.star.setVisibility(entry.getStar() ? View.VISIBLE : View.GONE);
         return convertView;
     }
 
@@ -147,20 +181,5 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    private void convertChildView(View itemView, Entry entry) {
-        TextView text1 = (TextView) itemView.findViewById(R.id.text1);
-        TextView text2 = (TextView) itemView.findViewById(R.id.text2);
-        View star = itemView.findViewById(R.id.star);
-
-        text1.setText(entry.getEmoticon());
-        if (showNote && !entry.getDescription().isEmpty()) {
-            text2.setText(entry.getDescription());
-            text2.setVisibility(View.VISIBLE);
-        } else {
-            text2.setVisibility(View.GONE);
-        }
-        star.setVisibility(entry.getStar() ? View.VISIBLE : View.GONE);
-        itemView.setTag(entry);
-    }
 
 }
