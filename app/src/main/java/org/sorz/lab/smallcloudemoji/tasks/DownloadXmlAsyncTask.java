@@ -11,7 +11,7 @@ import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
-import org.sorz.lab.smallcloudemoji.parsers.LoadingCancelException;
+import org.sorz.lab.smallcloudemoji.exceptions.LoadingCancelException;
 import org.sorz.lab.smallcloudemoji.parsers.RepositoryLoaderEventListener;
 import org.sorz.lab.smallcloudemoji.parsers.RepositoryXmlLoader;
 import org.xmlpull.v1.XmlPullParserException;

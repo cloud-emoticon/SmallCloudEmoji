@@ -13,89 +13,41 @@ package org.sorz.lab.smallcloudemoji.parsers;
 
 import android.util.Xml;
 
-import org.sorz.lab.smallcloudemoji.db.Category;
-import org.sorz.lab.smallcloudemoji.db.CategoryDao;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
-import org.sorz.lab.smallcloudemoji.db.Entry;
-import org.sorz.lab.smallcloudemoji.db.EntryDao;
-import org.sorz.lab.smallcloudemoji.db.Repository;
-import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
+import org.sorz.lab.smallcloudemoji.exceptions.LoadingCancelException;
+import org.sorz.lab.smallcloudemoji.exceptions.PullParserException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 
-public class RepositoryXmlLoader {
+public class RepositoryXmlLoader extends AbstractRepositoryLoader {
     private static final String ns = null;
-    private DaoSession daoSession;
-    private RepositoryDao repositoryDao;
-    private CategoryDao categoryDao;
-    private EntryDao entryDao;
-    private Date updateDate;
-    private RepositoryLoaderEventListener eventListener;
 
     public RepositoryXmlLoader(DaoSession daoSession) {
-        this.daoSession = daoSession;
-        repositoryDao = daoSession.getRepositoryDao();
-        categoryDao = daoSession.getCategoryDao();
-        entryDao = daoSession.getEntryDao();
+        super(daoSession);
     }
 
-    public void setLoaderEventListener(RepositoryLoaderEventListener eventListener) {
-        this.eventListener = eventListener;
-    }
-
-    public void loadToDatabase(final Repository repository, Reader xmlReader)
-            throws Exception {
-        updateDate = new Date();
-        if (repository.getLastUpdateDate() == null)
-            repository.setLastUpdateDate(updateDate);
-        // Insert it into database only when the repository is new one, i.e. ID is null.
-        if (repository.getId() == null)
-            repositoryDao.insert(repository);
+    @Override
+    protected void loadRepository(Reader reader)
+            throws PullParserException, IOException, LoadingCancelException {
         final XmlPullParser parser = Xml.newPullParser();
-        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-        parser.setInput(xmlReader);
-        parser.nextTag();
+        try {
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            parser.setInput(reader);
+            parser.nextTag();
+            loadRepository(parser);
+        } catch (XmlPullParserException e) {
+            throw new PullParserException(e);
+        } finally {
+            reader.close();
+        }
 
-        daoSession.callInTx(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                try {
-                    loadRepository(repository, parser);
-                } catch (Exception e) {
-                    // Delete all things if the repository is new one.
-                    // Otherwise keep all things to prevent lost usage statistics.
-                    if (repository.getLastUpdateDate().equals(updateDate)) {
-                        entryDao.queryBuilder()
-                                .where(EntryDao.Properties.LastUpdateDate.eq(updateDate))
-                                .buildDelete().executeDeleteWithoutDetachingEntities();
-                        categoryDao.queryBuilder()
-                                .where(CategoryDao.Properties.LastUpdateDate.eq(updateDate))
-                                .buildDelete().executeDeleteWithoutDetachingEntities();
-                        repository.delete();
-                    }
-                    throw e;
-                }
-                return null;
-            }
-        });
-
-        // Update updateDate after all, because it will be used to determine whether it is new one.
-        repository.setLastUpdateDate(updateDate);
-        repository.update();
     }
 
-
-    private void loadRepository(Repository repository, XmlPullParser parser)
+    private void loadRepository(XmlPullParser parser)
             throws XmlPullParserException, IOException, LoadingCancelException {
         parser.require(XmlPullParser.START_TAG, ns, "emoji");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -110,87 +62,33 @@ public class RepositoryXmlLoader {
                         !parser.getName().equals("infoos"))
                     ;
             } else if (tagName.equals("category")) {
-                loadCategory(parser, repository);
+                loadCategory(parser);
             }
         }
     }
 
 
-    private void loadCategory(XmlPullParser parser, Repository repository)
+    private void loadCategory(XmlPullParser parser)
             throws XmlPullParserException, IOException, LoadingCancelException {
         parser.require(XmlPullParser.START_TAG, ns, "category");
         String categoryName = parser.getAttributeValue(null, "name");
 
-        Category category = null;
-        // Try to get category from database first
-        // if the repository which it belong to is not new added one.
-        if (!repository.getLastUpdateDate().equals(updateDate)) {
-            category = categoryDao.queryBuilder()
-                    .where(CategoryDao.Properties.RepositoryId.eq(repository.getId()),
-                            CategoryDao.Properties.Name.eq(categoryName))
-                    .unique();
-        }
-        if (category == null) {
-            category = new Category(null, categoryName, false, updateDate, null);
-            category.setRepository(repository);
-            categoryDao.insert(category);
-        }
-        if (eventListener != null)
-            if (eventListener.onLoadingCategory(category))
-                throw new LoadingCancelException();
+        beginCategory(categoryName);
 
-        List<Entry> entries = new ArrayList<Entry>();
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             if (parser.getName().equals("entry")) {
-                Entry entry = loadEntry(parser, category);
-                entries.add(entry);
-                if (eventListener != null)
-                    if (eventListener.onEntryLoaded(entry))
-                        throw new LoadingCancelException();
+                loadEntry(parser);
             }
         }
-        List<Entry> updateEntries = new ArrayList<Entry>();
-        List<Entry> insertEntries = new ArrayList<Entry>();
-        if (!category.getLastUpdateDate().equals(updateDate)) {
-            List<Entry> oldEntries = entryDao.queryBuilder()
-                    .where(EntryDao.Properties.CategoryId.eq(category.getId()))
-                    .list();
-            if (oldEntries.size() > 0) {
-                Map<String, Entry> oldEntryMap = new HashMap<String, Entry>(oldEntries.size());
-                for (Entry entry : oldEntries) {
-                    oldEntryMap.put(entry.getEmoticon(), entry);
-                }
-                for (Entry entry : entries) {
-                    Entry oldEntry = oldEntryMap.get(entry.getEmoticon());
-                    if (oldEntry != null) {
-                        oldEntry.setLastUpdateDate(updateDate);
-                        oldEntry.setDescription(entry.getDescription());
-                        updateEntries.add(oldEntry);
-                    } else {
-                        insertEntries.add(entry);
-                    }
-                }
-            } else {
-                insertEntries = entries;
-            }
-        } else {
-            insertEntries = entries;
-        }
-        entryDao.insertInTx(insertEntries);
-        entryDao.updateInTx(updateEntries);
-
-        if (!category.getLastUpdateDate().equals(updateDate)) {
-            category.setLastUpdateDate(updateDate);
-            category.update();
-        }
+        endCategory();
     }
 
 
-    private Entry loadEntry(XmlPullParser parser, Category category)
-            throws XmlPullParserException, IOException {
+    private void loadEntry(XmlPullParser parser)
+            throws XmlPullParserException, IOException, LoadingCancelException {
         parser.require(XmlPullParser.START_TAG, ns, "entry");
         String emoticon = "";
         String description = "";
@@ -205,7 +103,7 @@ public class RepositoryXmlLoader {
                 description = readNote(parser);
             }
         }
-        return new Entry(null, emoticon, description, false, null, updateDate, category.getId());
+        addEntry(emoticon, description);
     }
 
 
