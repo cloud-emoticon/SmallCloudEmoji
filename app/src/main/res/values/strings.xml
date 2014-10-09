@@ -55,4 +55,5 @@
     <string name="repository_rename_title">New alias</string>
     <string name="toast_repository_copied">Repository URL copied.</string>
     <string name="download_unsupported">Unsupported file format.</string>
+    <string name="see_right_side">See right side</string>
 </resources>

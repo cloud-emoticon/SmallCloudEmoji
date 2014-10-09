@@ -85,12 +85,14 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
+
         // Click source management
-        Preference sourceManagePreference = findPreference("source_manage");
+        final Preference sourceManagePreference = findPreference("source_manage");
         sourceManagePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                mListener.onSourceManageClick();
+                if (!mListener.onSourceManageClick())
+                    sourceManagePreference.setSummary(R.string.see_right_side);
                 return true;
             }
         });
@@ -120,7 +122,7 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     public interface OnSourceManageClickListener {
-        public void onSourceManageClick();
+        public boolean onSourceManageClick();
     }
 
 }

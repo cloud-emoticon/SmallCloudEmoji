@@ -22,6 +22,7 @@ public class SettingsActivity extends Activity implements
         SettingsFragment.OnSourceManageClickListener {
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private RepositoryFragment repositoryFragment;
+    private boolean tabletLayout;
     private DaoSession daoSession;
 
     @Override
@@ -35,6 +36,9 @@ public class SettingsActivity extends Activity implements
         DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
 
         setContentView(R.layout.activity_settings);
+        repositoryFragment = (RepositoryFragment) getFragmentManager()
+                .findFragmentById(R.id.repository_frag);
+        tabletLayout = repositoryFragment != null;
     }
 
     @Override
@@ -79,7 +83,9 @@ public class SettingsActivity extends Activity implements
     }
 
     @Override
-    public void onSourceManageClick() {
+    public boolean onSourceManageClick() {
+        if (tabletLayout)
+            return false;
         FragmentManager fragmentManager = getFragmentManager();
         Fragment settingsFragment = fragmentManager.findFragmentById(R.id.settings_frag);
         if (repositoryFragment == null)
@@ -89,6 +95,7 @@ public class SettingsActivity extends Activity implements
                 .add(R.id.settings_container, repositoryFragment)
                 .addToBackStack(null)
                 .commit();
+        return true;
     }
 
     public void hideRepository(View view) {
