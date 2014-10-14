@@ -37,7 +37,6 @@ import java.util.Date;
 public class MainApplication extends SmallApplication {
     private SharedPreferences sharedPreferences;
     private MainExpandableAdapter adapter;
-    private DaoSession daoSession;
 
     @Override
     public void onCreate() {
@@ -56,7 +55,7 @@ public class MainApplication extends SmallApplication {
 
         // Open database.
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this, true);
-        daoSession = databaseHelper.getDaoSession();
+        DaoSession daoSession = databaseHelper.getDaoSession();
         EntryDao entryDao = daoSession.getEntryDao();
         RepositoryDao repositoryDao = daoSession.getRepositoryDao();
         DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
@@ -147,7 +146,7 @@ public class MainApplication extends SmallApplication {
     }
 
     private void updateRepository(final Repository repository) {
-        new DownloadAsyncTask(this, daoSession) {
+        new DownloadAsyncTask(this) {
             private ProgressDialog progressDialog;
 
             @Override

@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +22,6 @@ public class SettingsActivity extends Activity implements
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private RepositoryFragment repositoryFragment;
     private boolean tabletLayout;
-    private DaoSession daoSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +30,7 @@ public class SettingsActivity extends Activity implements
 
         // Open database.
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this, true);
-        daoSession = databaseHelper.getDaoSession();
+        DaoSession daoSession = databaseHelper.getDaoSession();
         DatabaseUpgrader.checkAndDoUpgrade(this, daoSession);
 
         setContentView(R.layout.activity_settings);
@@ -54,12 +52,12 @@ public class SettingsActivity extends Activity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(REPOSITORY_FRAGMENT_IS_SHOWING,
-                repositoryFragment != null && !repositoryFragment.isHidden());
+                repositoryFragment != null && !repositoryFragment.isHidden() & !tabletLayout);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState.getBoolean(REPOSITORY_FRAGMENT_IS_SHOWING, false)) {
+        if (savedInstanceState.getBoolean(REPOSITORY_FRAGMENT_IS_SHOWING, false) & !tabletLayout) {
             onSourceManageClick();
         }
     }
@@ -76,10 +74,6 @@ public class SettingsActivity extends Activity implements
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(
                     getFragmentManager().getBackStackEntryCount() > 0);
-    }
-
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     @Override

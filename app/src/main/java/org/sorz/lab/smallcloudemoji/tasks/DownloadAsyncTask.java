@@ -9,6 +9,7 @@ import com.google.common.io.CountingInputStream;
 import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.sorz.lab.smallcloudemoji.exceptions.LoadingCancelException;
@@ -45,10 +46,10 @@ public class DownloadAsyncTask extends AsyncTask<Repository, Integer, Integer> {
     protected static final int RESULT_ERROR_UNSUPPORTED_FORMAT = 7;
 
 
-    public DownloadAsyncTask(Context context, DaoSession daoSession) {
+    public DownloadAsyncTask(Context context) {
         super();
         this.context = context;
-        this.daoSession = daoSession;
+        daoSession = DatabaseHelper.getInstance(context, true).getDaoSession();
     }
 
     @Override
@@ -120,6 +121,7 @@ public class DownloadAsyncTask extends AsyncTask<Repository, Integer, Integer> {
             e.printStackTrace();
             return RESULT_ERROR_UNKNOWN;
         } finally {
+            DatabaseHelper.getInstance(context).close();
             try {
                 if (inputStream != null)
                     inputStream.close();

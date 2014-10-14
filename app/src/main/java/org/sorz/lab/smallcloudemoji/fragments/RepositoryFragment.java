@@ -208,7 +208,7 @@ public class RepositoryFragment extends Fragment {
                 .findViewWithTag(repository).getParent();
         final ProgressBar progressBar =
                 (ProgressBar) itemView.findViewById(R.id.repository_progressbar);
-        new DownloadAsyncTask(context, daoSession) {
+        new DownloadAsyncTask(context) {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();

@@ -22,7 +22,6 @@ public class AddRepositoryActivity extends Activity {
     private TextView aliasTextView;
     private Button okButton;
     private ProgressBar progressBar;
-    private DaoSession daoSession;
     private RepositoryDao repositoryDao;
     private DownloadAsyncTask asyncTask;
 
@@ -35,7 +34,7 @@ public class AddRepositoryActivity extends Activity {
         aliasTextView = (TextView) findViewById(R.id.repository_alias);
         okButton = (Button) findViewById(R.id.ok);
         progressBar = (ProgressBar) findViewById(R.id.repository_progressbar);
-        daoSession = DatabaseHelper.getInstance(this, true).getDaoSession();
+        DaoSession daoSession = DatabaseHelper.getInstance(this, true).getDaoSession();
         repositoryDao = daoSession.getRepositoryDao();
 
         Uri uri = getIntent().getData();
@@ -92,7 +91,7 @@ public class AddRepositoryActivity extends Activity {
         aliasTextView.setEnabled(false);
         okButton.setEnabled(false);
 
-        asyncTask = new DownloadAsyncTask(this, daoSession) {
+        asyncTask = new DownloadAsyncTask(this) {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
