@@ -12,6 +12,7 @@ public class AppDaoGenerator {
         Schema schema = new Schema(1, "org.sorz.lab.smallcloudemoji.db");
 
         addEntities(schema);
+        addSources(schema);
 
         new DaoGenerator().generateAll(schema, "app/src-gen");
     }
@@ -51,4 +52,21 @@ public class AppDaoGenerator {
         categoryToEntries.orderDesc(lastUsed);
     }
 
+    private static void addSources(Schema schema) {
+        Entity source = schema.addEntity("Source");
+        source.addIdProperty().index();
+        source.addStringProperty("name").notNull();
+        source.addStringProperty("iconUrl");
+        source.addDateProperty("postDate");
+        source.addStringProperty("introduction");
+        source.addStringProperty("creator");
+        source.addStringProperty("creatorUrl");
+        source.addStringProperty("server");
+        source.addStringProperty("serverUrl");
+        source.addStringProperty("dataFormat");
+        source.addStringProperty("installUrl");
+        source.addStringProperty("codeUrl").index().notNull();
+        source.addStringProperty("storeUrl");
+        source.addBooleanProperty("installed").index();
+    }
 }
