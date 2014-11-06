@@ -110,6 +110,7 @@ public class StoreSourceAdapter extends BaseAdapter {
         viewHolder.name.setText(source.getName());
         viewHolder.introduction.setText(source.getIntroduction());
         viewHolder.creator.setText(source.getCreator());
+        viewHolder.icon.setImageResource(R.drawable.ic_empty_avatar);
         new LoadIStoreIconAsyncTask(context, viewHolder, iconCache).execute(source.getIconUrl());
         return convertView;
     }
