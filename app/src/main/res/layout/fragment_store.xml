@@ -9,16 +9,10 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8pt"
+        android:paddingTop="3pt"
         android:divider="@null"
         android:dividerHeight="0dp"
         android:clickable="true" >
     </ListView>
-
-    <TextView
-        android:id="@android:id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center" />
 
 </android.support.v4.widget.SwipeRefreshLayout>

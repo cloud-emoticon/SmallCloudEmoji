@@ -22,6 +22,7 @@ public class SettingsActivity extends Activity implements
         SettingsFragment.OnSourceManageClickListener,
         RepositoryFragment.OnEmoticonStoreClickListener {
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
+    private final static String STORE_FRAGMENT_IS_SHOWING = "STORE_FRAGMENT_IS_SHOWING";
     private RepositoryFragment repositoryFragment;
     private StoreFragment storeFragment;
     private boolean tabletLayout;
@@ -55,13 +56,22 @@ public class SettingsActivity extends Activity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(REPOSITORY_FRAGMENT_IS_SHOWING,
-                repositoryFragment != null && !repositoryFragment.isHidden() & !tabletLayout);
+                repositoryFragment != null && !repositoryFragment.isHidden());
+        outState.putBoolean(STORE_FRAGMENT_IS_SHOWING,
+                storeFragment != null && !storeFragment.isHidden());
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState.getBoolean(REPOSITORY_FRAGMENT_IS_SHOWING, false) & !tabletLayout) {
-            onSourceManageClick();
+        if (!tabletLayout) {
+            if (savedInstanceState.getBoolean(REPOSITORY_FRAGMENT_IS_SHOWING, false)) {
+                onSourceManageClick();
+            } else if (savedInstanceState.getBoolean(STORE_FRAGMENT_IS_SHOWING, false)) {
+                onSourceManageClick();
+                onEmoticonStoreClick();
+            }
+        } else {
+            // TODO: Support tablet layout.
         }
     }
 

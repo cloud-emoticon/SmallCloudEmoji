@@ -11,6 +11,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.sorz.lab.smallcloudemoji.R;
+import org.sorz.lab.smallcloudemoji.adapters.StoreSourceAdapter;
+import org.sorz.lab.smallcloudemoji.db.DaoSession;
+import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.tasks.RefreshStoreAsyncTask;
 
 
@@ -20,8 +23,10 @@ import org.sorz.lab.smallcloudemoji.tasks.RefreshStoreAsyncTask;
 public class StoreFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String STORE_URL = "storeUrl";
     private Context context;
+    private DaoSession daoSession;
     private String storeUrl;
     private SwipeRefreshLayout swipeLayout;
+    private StoreSourceAdapter adapter;
 
     public static StoreFragment newInstance(String storeUrl) {
         StoreFragment fragment = new StoreFragment();
@@ -38,6 +43,8 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity();
+        daoSession = DatabaseHelper.getInstance(context).getDaoSession();
+
         if (getArguments() != null) {
             storeUrl = getArguments().getString(STORE_URL);
         }
@@ -51,9 +58,10 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
         swipeLayout.setOnRefreshListener(this);
 
         ListView listView = (ListView) view.findViewById(android.R.id.list);
+        adapter = new StoreSourceAdapter(context, daoSession.getSourceDao());
+        listView.setAdapter(adapter);
 
         return view;
-
     }
 
 
@@ -76,6 +84,7 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
             protected void onPostExecute(Integer result) {
                 super.onPostExecute(result);
                 swipeLayout.setRefreshing(false);
+                adapter.notifyDataSetChanged();
                 if (result == RESULT_SUCCESS)
                     Toast.makeText(context, "success", Toast.LENGTH_SHORT).show();
                 else if (result == RESULT_ERROR_IO)

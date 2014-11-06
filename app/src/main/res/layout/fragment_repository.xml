@@ -9,9 +9,9 @@
         android:id="@+id/repository_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8pt"
         android:divider="@null"
         android:dividerHeight="0dp"
+        android:paddingTop="3pt"
         android:clickable="true"
         android:longClickable="true" />
 

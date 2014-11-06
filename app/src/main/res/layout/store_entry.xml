@@ -3,6 +3,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:paddingTop="3pt"
+    android:paddingLeft="8pt"
+    android:paddingRight="8pt"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -18,12 +20,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/go_emoticon_store_title" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="@string/go_emoticon_store_description" />
 
