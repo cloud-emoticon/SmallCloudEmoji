@@ -78,13 +78,17 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
                 swipeLayout.setRefreshing(false);
                 adapter.notifyDataSetChanged();
                 if (result == RESULT_SUCCESS)
-                    Toast.makeText(context, "success", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,
+                            R.string.download_success, Toast.LENGTH_SHORT).show();
                 else if (result == RESULT_ERROR_IO)
-                    Toast.makeText(context, "io error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,
+                            R.string.download_io_exception, Toast.LENGTH_SHORT).show();
                 else if (result == RESULT_ERROR_SERVER_FAIL)
-                    Toast.makeText(context, "server fail", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,
+                            R.string.store_server_fail, Toast.LENGTH_SHORT).show();
                 else
-                    Toast.makeText(context, "unknown error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,
+                            R.string.download_unknown_error, Toast.LENGTH_SHORT).show();
             }
         }.execute(storeUrl);
     }
