@@ -25,6 +25,7 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
     private Context context;
     private DaoSession daoSession;
     private String storeUrl;
+
     private SwipeRefreshLayout swipeLayout;
     private StoreSourceAdapter adapter;
 

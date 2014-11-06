@@ -1,6 +1,8 @@
 package org.sorz.lab.smallcloudemoji.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,8 @@ public class StoreSourceAdapter extends BaseAdapter {
     private SourceDao sourceDao;
     private List<Source> sources;
 
+    private LruCache<String, Bitmap> iconCache;
+
     public static class ViewHolder {
         public int position;
         public ImageView icon;
@@ -37,6 +41,21 @@ public class StoreSourceAdapter extends BaseAdapter {
         this.context = context;
         this.sourceDao = sourceDao;
         inflater = LayoutInflater.from(context);
+
+        // Get max available VM memory in KiB.
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        // Use 1/16th of the available memory for icon cache.
+        // ~70 icons in 120 x 120px for 64MiB available memory.
+        final int cacheSize = maxMemory / 16;
+
+        iconCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
 
         loadSources();
     }
@@ -91,7 +110,7 @@ public class StoreSourceAdapter extends BaseAdapter {
         viewHolder.name.setText(source.getName());
         viewHolder.introduction.setText(source.getIntroduction());
         viewHolder.creator.setText(source.getCreator());
-        new LoadIStoreIconAsyncTask(viewHolder).execute(source.getIconUrl());
+        new LoadIStoreIconAsyncTask(context, viewHolder, iconCache).execute(source.getIconUrl());
         return convertView;
     }
 
@@ -103,6 +122,7 @@ public class StoreSourceAdapter extends BaseAdapter {
     @Override
     public void notifyDataSetChanged() {
         loadSources();
+        iconCache.evictAll();
         super.notifyDataSetChanged();
     }
 }

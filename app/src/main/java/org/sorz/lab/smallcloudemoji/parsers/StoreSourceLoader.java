@@ -36,15 +36,18 @@ public class StoreSourceLoader {
         repositoryDao = daoSession.getRepositoryDao();
     }
 
-    public void loadToDatabase(Reader reader)
-        throws IOException, PullParserException {
-        loadToDatabase(reader, null);
-    }
-
-    public void loadToDatabase(Reader reader, String lastUpdateTime)
+    /**
+     * Parse source from XML reader to databases.
+     * @param reader Reader of XML file.
+     * @param lastUpdateTime Latest update time of store.
+     * @return Update time of current store (may be not changed if it's already updated so that
+     * parsing is canceled.
+     */
+    public String loadToDatabase(Reader reader, String lastUpdateTime)
             throws IOException, PullParserException {
 
         XmlPullParser parser = Xml.newPullParser();
+        String updateTime;
         try {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(reader);
@@ -53,10 +56,10 @@ public class StoreSourceLoader {
             parser.require(XmlPullParser.START_TAG, NAME_SPACE, ROOT_TAG);
 
             // Continue parser only when newer version exists.
-            String updateTime = parser.getAttributeValue(NAME_SPACE, "updatetime");
+            updateTime = parser.getAttributeValue(NAME_SPACE, "updatetime");
             if (lastUpdateTime != null && updateTime != null) {
                 if (lastUpdateTime.equals(updateTime))
-                    return;
+                    return updateTime;
             }
 
             // Check whether already installed for each.
@@ -82,6 +85,10 @@ public class StoreSourceLoader {
             e.printStackTrace();
             throw new PullParserException(e);
         }
+        if (updateTime == null)
+            return "0";
+        else
+            return updateTime;
     }
 
     private static List<Source> loadStore(XmlPullParser parser)
