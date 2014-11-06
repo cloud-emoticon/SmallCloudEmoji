@@ -5,11 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Source;
 import org.sorz.lab.smallcloudemoji.db.SourceDao;
+import org.sorz.lab.smallcloudemoji.tasks.LoadIStoreIconAsyncTask;
 
 import java.util.List;
 
@@ -22,9 +24,12 @@ public class StoreSourceAdapter extends BaseAdapter {
     private SourceDao sourceDao;
     private List<Source> sources;
 
-    private static class ViewHolder {
+    public static class ViewHolder {
+        public int position;
+        public ImageView icon;
         TextView name;
         TextView introduction;
+        TextView creator;
     }
 
     public StoreSourceAdapter(Context context, SourceDao sourceDao) {
@@ -74,14 +79,19 @@ public class StoreSourceAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             viewHolder.name = (TextView) convertView.findViewById(R.id.source_name);
             viewHolder.introduction = (TextView) convertView.findViewById(R.id.source_introduction);
+            viewHolder.icon = (ImageView) convertView.findViewById(R.id.source_icon);
+            viewHolder.creator = (TextView) convertView.findViewById(R.id.source_creator);
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         Source source = getItem(position);
+        viewHolder.position = position;
         viewHolder.name.setText(source.getName());
         viewHolder.introduction.setText(source.getIntroduction());
-
+        viewHolder.creator.setText(source.getCreator());
+        new LoadIStoreIconAsyncTask(viewHolder).execute(source.getIconUrl());
         return convertView;
     }
 

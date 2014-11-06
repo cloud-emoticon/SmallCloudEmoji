@@ -61,4 +61,5 @@
     <string name="go_emoticon_store_description">Variety of emoticons created by community</string>
     <string name="go_emoticon_store_no_warranty">Supported by +Yashi without any warranty</string>
     <string name="go_emoticon_store_incomplete_translation">May contains Chinese characters</string>
+    <string name="source_icon_description">Avatar of creator</string>
 </resources>
