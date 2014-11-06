@@ -56,4 +56,9 @@
     <string name="toast_repository_copied">Repository URL copied.</string>
     <string name="download_unsupported">Unsupported file format.</string>
     <string name="see_right_side">See right side</string>
+    <string name="store_url" translatable="false">http://emoticon.moe/store.xml</string>
+    <string name="go_emoticon_store_title">Go to Emoticon Store</string>
+    <string name="go_emoticon_store_description">Variety of emoticons created by community.</string>
+    <string name="go_emoticon_store_no_warranty">Supported by +Yashi without any warranty</string>
+    <string name="go_emoticon_store_incomplete_translation">May contains Chinese characters</string>
 </resources>

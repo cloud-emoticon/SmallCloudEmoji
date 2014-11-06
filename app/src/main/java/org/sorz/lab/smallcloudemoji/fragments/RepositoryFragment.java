@@ -45,6 +45,7 @@ import java.util.List;
 public class RepositoryFragment extends Fragment {
     private final static int REQUEST_FOR_ADDING_REPOSITORY = 1;
     private Context context;
+    private OnEmoticonStoreClickListener mListener;
     private DaoSession daoSession;
     private RepositoryDao repositoryDao;
     private RepositoryAdapter adapter;
@@ -57,6 +58,7 @@ public class RepositoryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity();
+        mListener = (OnEmoticonStoreClickListener) context;
         daoSession = DatabaseHelper.getInstance(context).getDaoSession();
         repositoryDao = daoSession.getRepositoryDao();
         adapter = new RepositoryAdapter(context, daoSession);
@@ -69,6 +71,9 @@ public class RepositoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_repository, container, false);
         listView = (ListView) view.findViewById(R.id.repository_list);
+        View footer = getActivity().getLayoutInflater().inflate(R.layout.store_entry, null);
+        View goEmoticonStore = footer.findViewById(R.id.goEmoticonStore);
+        listView.addFooterView(footer, null, false);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -90,6 +95,12 @@ public class RepositoryFragment extends Fragment {
                 Toast.makeText(context, R.string.toast_repository_copied,
                         Toast.LENGTH_SHORT).show();
                 return true;
+            }
+        });
+        goEmoticonStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onEmoticonStoreClick();
             }
         });
         return view;
@@ -310,6 +321,10 @@ public class RepositoryFragment extends Fragment {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.yes, onClickListener)
                 .show();
+    }
+
+    public interface OnEmoticonStoreClickListener {
+        public void onEmoticonStoreClick();
     }
 
 }

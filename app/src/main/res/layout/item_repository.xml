@@ -9,11 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/card_background"
-        android:layout_marginLeft="8pt"
-        android:layout_marginRight="8pt"
         android:layout_marginTop="3pt"
         android:layout_marginBottom="3pt"
-        android:padding="5pt">
+        android:padding="5pt" >
 
         <TextView
             android:layout_width="wrap_content"

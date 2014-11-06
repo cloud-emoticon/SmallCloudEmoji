@@ -14,13 +14,16 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.fragments.RepositoryFragment;
 import org.sorz.lab.smallcloudemoji.fragments.SettingsFragment;
+import org.sorz.lab.smallcloudemoji.fragments.StoreFragment;
 
 
 public class SettingsActivity extends Activity implements
         FragmentManager.OnBackStackChangedListener,
-        SettingsFragment.OnSourceManageClickListener {
+        SettingsFragment.OnSourceManageClickListener,
+        RepositoryFragment.OnEmoticonStoreClickListener {
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private RepositoryFragment repositoryFragment;
+    private StoreFragment storeFragment;
     private boolean tabletLayout;
 
     @Override
@@ -79,7 +82,7 @@ public class SettingsActivity extends Activity implements
     @Override
     public boolean onSourceManageClick() {
         if (tabletLayout)
-            return false;
+            return false;  // TODO: Support Store
         FragmentManager fragmentManager = getFragmentManager();
         Fragment settingsFragment = fragmentManager.findFragmentById(R.id.settings_frag);
         if (repositoryFragment == null)
@@ -90,6 +93,21 @@ public class SettingsActivity extends Activity implements
                 .addToBackStack(null)
                 .commit();
         return true;
+    }
+
+    @Override
+    public void onEmoticonStoreClick() {
+        if (tabletLayout) {
+            return; // TODO: Support tablet layout
+        }
+        FragmentManager fragmentManager = getFragmentManager();
+        if (storeFragment == null)
+            storeFragment = StoreFragment.newInstance(getString(R.string.store_url));
+        fragmentManager.beginTransaction()
+                .hide(repositoryFragment)
+                .add(R.id.settings_container, storeFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     public void hideRepository(View view) {
