@@ -63,4 +63,5 @@
     <string name="go_emoticon_store_incomplete_translation">May contains Chinese characters</string>
     <string name="source_icon_description">Avatar of creator</string>
     <string name="store_server_fail">Store is temporary closed</string>
+    <string name="please_pull_down">Pull Down to Refresh</string>
 </resources>
