@@ -1,7 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5pt"
+    android:padding="6pt"
     tools:context="org.sorz.lab.smallcloudemoji.fragments.SourceFragment">
 
 
@@ -10,43 +10,79 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <TextView
+            <ImageView
+                android:layout_width="24pt"
+                android:layout_height="24pt"
+                android:layout_marginRight="6pt"
+                android:layout_marginEnd="6pt"
+                android:layout_gravity="end"
+                android:contentDescription="@string/source_icon_description"
+                android:background="@drawable/ic_empty_avatar"
+                android:id="@+id/source_icon" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="Large Text"
+                        android:id="@+id/source_name" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text="2014-02-02"
+                        android:id="@+id/source_postdate" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/source_name" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="2014-02-02"
-            android:id="@+id/source_postdate" />
+            android:text="Install"
+            android:id="@+id/button"
+            android:layout_gravity="end" />
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dip"
+            android:layout_marginTop="5pt"
+            android:layout_marginBottom="5pt"
+            android:background="?android:attr/dividerHorizontal" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Medium Text"
+            android:layout_margin="5pt"
+            android:id="@+id/source_introduction"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:layout_marginTop="3pt"
+            android:layout_marginBottom="5pt"
             android:background="?android:attr/dividerHorizontal" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Introduction" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:id="@+id/source_introduction" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/darker_gray"
             android:text="Maintainer" />
 
         <TextView
@@ -54,12 +90,14 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
+            android:layout_marginBottom="5pt"
             android:id="@+id/source_creator" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/darker_gray"
             android:text="Server" />
 
         <TextView
@@ -67,7 +105,9 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
+            android:layout_marginBottom="5pt"
             android:id="@+id/source_server" />
+
 
 
     </LinearLayout>
