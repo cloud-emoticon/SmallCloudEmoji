@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Small Cloud Emoticon</string>
     <string name="action_close">Close</string>
     <string name="list_title_favorite">Favorites</string>
@@ -65,4 +66,6 @@
     <string name="store_server_fail">Store is temporary closed</string>
     <string name="please_pull_down">Pull Down to Refresh</string>
     <string name="source_installed">Installed</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

@@ -25,6 +25,7 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
     private Context context;
     private DaoSession daoSession;
     private String storeUrl;
+    private OnSourceClickListener mListener;
 
     private SwipeRefreshLayout swipeLayout;
     private StoreSourceAdapter adapter;
@@ -44,6 +45,7 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity();
+        mListener = (OnSourceClickListener) context;
         daoSession = DatabaseHelper.getInstance(context).getDaoSession();
 
         if (getArguments() != null) {
@@ -72,6 +74,8 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        if (!swipeLayout.isRefreshing())
+            mListener.onSourceClick(id);
     }
 
     @Override
@@ -96,5 +100,9 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
                             R.string.download_unknown_error, Toast.LENGTH_SHORT).show();
             }
         }.execute(storeUrl);
+    }
+
+    public interface OnSourceClickListener {
+        public void onSourceClick(long sourceId);
     }
 }

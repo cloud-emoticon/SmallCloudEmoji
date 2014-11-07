@@ -14,15 +14,18 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.DatabaseUpgrader;
 import org.sorz.lab.smallcloudemoji.fragments.RepositoryFragment;
 import org.sorz.lab.smallcloudemoji.fragments.SettingsFragment;
+import org.sorz.lab.smallcloudemoji.fragments.SourceFragment;
 import org.sorz.lab.smallcloudemoji.fragments.StoreFragment;
 
 
 public class SettingsActivity extends Activity implements
         FragmentManager.OnBackStackChangedListener,
         SettingsFragment.OnSourceManageClickListener,
-        RepositoryFragment.OnEmoticonStoreClickListener {
+        RepositoryFragment.OnEmoticonStoreClickListener,
+        StoreFragment.OnSourceClickListener {
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private final static String STORE_FRAGMENT_IS_SHOWING = "STORE_FRAGMENT_IS_SHOWING";
+    
     private RepositoryFragment repositoryFragment;
     private StoreFragment storeFragment;
     private boolean tabletLayout;
@@ -116,6 +119,20 @@ public class SettingsActivity extends Activity implements
         fragmentManager.beginTransaction()
                 .hide(repositoryFragment)
                 .add(R.id.settings_container, storeFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void onSourceClick(long sourceId) {
+        if (tabletLayout) {
+            return; // TODO: Support tablet layout
+        }
+        FragmentManager fragmentManager = getFragmentManager();
+        SourceFragment sourceFragment = SourceFragment.newInstance(sourceId);
+        fragmentManager.beginTransaction()
+                .hide(storeFragment)
+                .add(R.id.settings_container, sourceFragment)
                 .addToBackStack(null)
                 .commit();
     }
