@@ -69,8 +69,7 @@ public class StoreSourceLoader {
                         .where(RepositoryDao.Properties.Url.eq(source.getCodeUrl()))
                         .limit(1)
                         .count();
-                if (count != 0)
-                    source.setInstalled(true);
+                source.setInstalled(count != 0);
             }
 
             daoSession.runInTx(new Runnable() {

@@ -7,6 +7,9 @@ import android.preference.PreferenceManager;
 
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
+import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.sorz.lab.smallcloudemoji.db.Source;
+import org.sorz.lab.smallcloudemoji.db.SourceDao;
 import org.sorz.lab.smallcloudemoji.exceptions.PullParserException;
 import org.sorz.lab.smallcloudemoji.parsers.StoreSourceLoader;
 
@@ -19,6 +22,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Download store xml and pass it to loader.
@@ -72,6 +78,27 @@ public class RefreshStoreAsyncTask extends AsyncTask<String, Integer, Integer> {
                     //noinspection ResultOfMethodCallIgnored
                     file.delete();
                 }
+            } else {
+                // Check and ensure installed sign is correct.
+                // Checking after updating is unnecessary because all installed sign will be
+                // reset after updating.
+                SourceDao sourceDao = daoSession.getSourceDao();
+                List<Repository> repositories = daoSession.getRepositoryDao().queryBuilder().list();
+                HashSet<String> urlSet = new HashSet<String>(repositories.size());
+                for (Repository repository : repositories)
+                    urlSet.add(repository.getUrl());
+
+                List<Source> sources = sourceDao.queryBuilder().list();
+                List<Source> updateSources = new ArrayList<Source>();
+                for (Source source : sources) {
+                    boolean installed = urlSet.contains(source.getCodeUrl());
+                    if (source.getInstalled() != installed) {
+                        source.setInstalled(installed);
+                        updateSources.add(source);
+                    }
+                }
+                if (!updateSources.isEmpty())
+                    sourceDao.updateInTx(updateSources);
             }
 
         } catch (MalformedURLException e) {

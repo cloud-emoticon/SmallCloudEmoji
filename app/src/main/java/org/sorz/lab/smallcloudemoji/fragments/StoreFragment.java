@@ -61,7 +61,6 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
         ListView listView = (ListView) view.findViewById(android.R.id.list);
         adapter = new StoreSourceAdapter(context, daoSession.getSourceDao());
         listView.setAdapter(adapter);
-        listView.setEmptyView(inflater.inflate(R.layout.empty_store, container, false));
 
         if (adapter.isEmpty()) {
             swipeLayout.setRefreshing(true);

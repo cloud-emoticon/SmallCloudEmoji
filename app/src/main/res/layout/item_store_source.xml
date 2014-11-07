@@ -59,6 +59,19 @@
             android:layout_toRightOf="@+id/source_creator_box"
             android:layout_below="@id/source_name" />
 
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/source_installed"
+            android:layout_below="@id/source_introduction"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:textColor="@android:color/holo_green_dark"
+            android:text="@string/source_installed" />
+
     </RelativeLayout>
 
 

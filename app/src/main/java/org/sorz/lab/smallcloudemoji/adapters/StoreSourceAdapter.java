@@ -34,6 +34,7 @@ public class StoreSourceAdapter extends BaseAdapter {
         TextView name;
         TextView introduction;
         TextView creator;
+        TextView installed;
     }
 
     public StoreSourceAdapter(Context context, SourceDao sourceDao) {
@@ -100,6 +101,7 @@ public class StoreSourceAdapter extends BaseAdapter {
             viewHolder.introduction = (TextView) convertView.findViewById(R.id.source_introduction);
             viewHolder.icon = (ImageView) convertView.findViewById(R.id.source_icon);
             viewHolder.creator = (TextView) convertView.findViewById(R.id.source_creator);
+            viewHolder.installed = (TextView) convertView.findViewById(R.id.source_installed);
 
             convertView.setTag(viewHolder);
         } else {
@@ -110,6 +112,7 @@ public class StoreSourceAdapter extends BaseAdapter {
         viewHolder.name.setText(source.getName());
         viewHolder.introduction.setText(source.getIntroduction());
         viewHolder.creator.setText(source.getCreator());
+        viewHolder.installed.setVisibility(source.getInstalled() ? View.VISIBLE : View.GONE);
         viewHolder.icon.setImageResource(R.drawable.ic_empty_avatar);
         new LoadIStoreIconAsyncTask(context, viewHolder, iconCache).execute(source.getIconUrl());
         return convertView;

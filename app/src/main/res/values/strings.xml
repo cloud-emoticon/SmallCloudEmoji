@@ -64,4 +64,5 @@
     <string name="source_icon_description">Avatar of creator</string>
     <string name="store_server_fail">Store is temporary closed</string>
     <string name="please_pull_down">Pull Down to Refresh</string>
+    <string name="source_installed">Installed</string>
 </resources>

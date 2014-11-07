@@ -64,7 +64,7 @@ public class AppDaoGenerator {
         source.addStringProperty("server");
         source.addStringProperty("serverUrl");
         source.addStringProperty("dataFormat");
-        source.addStringProperty("installUrl");
+        source.addStringProperty("installUrl").notNull();
         source.addStringProperty("codeUrl").index().notNull();
         source.addStringProperty("storeUrl");
         source.addBooleanProperty("installed").index();
