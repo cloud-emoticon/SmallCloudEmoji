@@ -9,7 +9,7 @@ import de.greenrobot.daogenerator.ToMany;
 public class AppDaoGenerator {
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Schema(1, "org.sorz.lab.smallcloudemoji.db");
+        Schema schema = new Schema(2, "org.sorz.lab.smallcloudemoji.db");
 
         addEntities(schema);
         addSources(schema);

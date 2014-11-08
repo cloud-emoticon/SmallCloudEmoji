@@ -28,7 +28,7 @@ public class DatabaseHelper {
     }
 
     private DatabaseHelper(Context context) {
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "repo.db", null);
+        DaoMaster.OpenHelper helper = new ReleaseOpenHelper(context, "repo.db", null);
         SQLiteDatabase db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
