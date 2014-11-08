@@ -1,7 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/settings_container"
     android:orientation="horizontal" >
 
 
@@ -21,10 +20,18 @@
             android:text="@string/pref_source_manage_title"
             style="?android:attr/listSeparatorTextViewStyle" />
 
-        <fragment class="org.sorz.lab.smallcloudemoji.fragments.RepositoryFragment"
-            android:id="@+id/repository_frag"
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:id="@+id/settings_container" >
+
+            <fragment class="org.sorz.lab.smallcloudemoji.fragments.RepositoryFragment"
+                android:id="@+id/repository_frag"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"/>
+
+        </FrameLayout>
+
 
     </LinearLayout>
 

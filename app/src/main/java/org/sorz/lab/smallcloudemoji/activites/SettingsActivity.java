@@ -81,7 +81,9 @@ public class SettingsActivity extends Activity implements
                 onEmoticonStoreClick();
             }
         } else {
-            // TODO: Support tablet layout.
+            if (savedInstanceState.getBoolean(STORE_FRAGMENT_IS_SHOWING, false)) {
+                onEmoticonStoreClick();
+            }
         }
     }
 
@@ -113,7 +115,7 @@ public class SettingsActivity extends Activity implements
     @Override
     public boolean onSourceManageClick() {
         if (tabletLayout)
-            return false;  // TODO: Support Store
+            return false;
         FragmentManager fragmentManager = getFragmentManager();
         Fragment settingsFragment = fragmentManager.findFragmentById(R.id.settings_frag);
         if (repositoryFragment == null)
@@ -128,9 +130,6 @@ public class SettingsActivity extends Activity implements
 
     @Override
     public void onEmoticonStoreClick() {
-        if (tabletLayout) {
-            return; // TODO: Support tablet layout
-        }
         FragmentManager fragmentManager = getFragmentManager();
         if (storeFragment == null)
             storeFragment = StoreFragment.newInstance(getString(R.string.store_url));
@@ -143,9 +142,6 @@ public class SettingsActivity extends Activity implements
 
     @Override
     public void onSourceClick(long sourceId) {
-        if (tabletLayout) {
-            return; // TODO: Support tablet layout
-        }
         FragmentManager fragmentManager = getFragmentManager();
         SourceFragment sourceFragment = SourceFragment.newInstance(sourceId);
         fragmentManager.beginTransaction()
