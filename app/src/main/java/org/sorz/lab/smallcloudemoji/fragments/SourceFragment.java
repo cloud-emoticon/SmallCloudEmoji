@@ -38,8 +38,6 @@ public class SourceFragment extends Fragment {
     private static final String SOURCE_ID = "source_id";
 
     private Context context;
-    private DaoSession daoSession;
-    private SourceDao sourceDao;
     private Source source;
     private LruCache<String, Bitmap> iconCache;
 
@@ -62,8 +60,8 @@ public class SourceFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity();
-        daoSession = DatabaseHelper.getInstance(context).getDaoSession();
-        sourceDao = daoSession.getSourceDao();
+        DaoSession daoSession = DatabaseHelper.getInstance(context).getDaoSession();
+        SourceDao sourceDao = daoSession.getSourceDao();
         iconCache = ((IconCacheHolder) context).getIconCache();
 
         if (getArguments() != null) {

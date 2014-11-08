@@ -24,10 +24,10 @@ import java.util.concurrent.Callable;
  * The abstract class implements all database-related methods, but not parser-related methods.
  */
 public abstract class RepositoryLoader {
-    private DaoSession daoSession;
-    private RepositoryDao repositoryDao;
-    private CategoryDao categoryDao;
-    private EntryDao entryDao;
+    private final DaoSession daoSession;
+    private final RepositoryDao repositoryDao;
+    private final CategoryDao categoryDao;
+    private final EntryDao entryDao;
 
     private Date updateDate;
     private boolean isNewRepository;
@@ -42,7 +42,7 @@ public abstract class RepositoryLoader {
         this.eventListener = eventListener;
     }
 
-    public RepositoryLoader(DaoSession daoSession) {
+    RepositoryLoader(DaoSession daoSession) {
         this.daoSession = daoSession;
         repositoryDao = daoSession.getRepositoryDao();
         categoryDao = daoSession.getCategoryDao();
@@ -109,10 +109,11 @@ public abstract class RepositoryLoader {
      * Add a category to database,
      * and all entries will be added to this category before endCategory called.
      * Must be called before endCategory() called.
+     *
      * @param name The name of category.
      * @throws LoadingCancelException Loading canceled via LoaderEventListener.
      */
-    protected void beginCategory(String name)
+    void beginCategory(String name)
             throws LoadingCancelException {
         if (currentCategory != null)
             endCategory();
@@ -144,11 +145,12 @@ public abstract class RepositoryLoader {
 
     /**
      * Add a entry to buffer.
-     * @param emoticon Emoticon string.
+     *
+     * @param emoticon    Emoticon string.
      * @param description Optional description string.
      * @throws LoadingCancelException Loading canceled via LoaderEventListener.
      */
-    protected void addEntry(String emoticon, String description) throws LoadingCancelException {
+    void addEntry(String emoticon, String description) throws LoadingCancelException {
         if (description == null)
             description = "";
         if (currentEntries == null)
@@ -167,7 +169,7 @@ public abstract class RepositoryLoader {
      * Add or update all entries on buffer into database.
      * Must be called in the end of parsing category.
      */
-    protected void endCategory() {
+    void endCategory() {
         List<Entry> updateEntries = new ArrayList<Entry>();
         List<Entry> insertEntries = new ArrayList<Entry>();
         if (!isNewRepository) {

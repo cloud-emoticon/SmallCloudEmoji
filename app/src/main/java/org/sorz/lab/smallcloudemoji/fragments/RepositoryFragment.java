@@ -137,7 +137,7 @@ public class RepositoryFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void notifyRepositoriesChanged() {
+    void notifyRepositoriesChanged() {
         adapter.notifyDataSetChanged();
         listView.invalidateViews();  // This shit wasted my one hour.
     }
@@ -213,6 +213,8 @@ public class RepositoryFragment extends Fragment {
             renameRepository(repository);
         } else if (itemId == R.id.menu_repository_delete) {
             deleteRepositoryIfConfirmed(repository);
+        } else {
+            return false;
         }
         return true;
     }

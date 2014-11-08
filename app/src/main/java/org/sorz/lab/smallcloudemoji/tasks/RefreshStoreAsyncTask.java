@@ -31,9 +31,9 @@ import java.util.List;
  * And clear icon cache files when appropriate.
  */
 public class RefreshStoreAsyncTask extends AsyncTask<String, Integer, Integer> {
-    private Context context;
-    private DaoSession daoSession;
-    private SharedPreferences preferences;
+    private final Context context;
+    private final DaoSession daoSession;
+    private final SharedPreferences preferences;
 
     private static final String LAST_UPDATE_TIME = "store_last_update_time";
     protected static final int RESULT_SUCCESS = 0;
@@ -66,7 +66,7 @@ public class RefreshStoreAsyncTask extends AsyncTask<String, Integer, Integer> {
                     new BufferedReader(new InputStreamReader(inputStream)), lastUpdateTime);
 
             // Clear icon file cache if store has been updated.
-            if (! updateTime.equals(lastUpdateTime)) {
+            if (!updateTime.equals(lastUpdateTime)) {
                 preferences.edit().putString(LAST_UPDATE_TIME, updateTime).apply();
                 File[] files = context.getCacheDir().listFiles(new FilenameFilter() {
                     @Override

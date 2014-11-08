@@ -20,14 +20,12 @@ import java.util.List;
  * Get repositories from database and generate a view for each them.
  */
 public class RepositoryAdapter extends BaseAdapter {
-    final private Context context;
     final private LayoutInflater inflater;
     private List<Repository> repositories;
-    private RepositoryDao repositoryDao;
+    private final RepositoryDao repositoryDao;
 
     public RepositoryAdapter(Context context, DaoSession daoSession) {
         super();
-        this.context = context;
         repositoryDao = daoSession.getRepositoryDao();
         inflater = LayoutInflater.from(context);
 

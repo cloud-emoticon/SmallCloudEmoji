@@ -22,12 +22,12 @@ import java.util.List;
  * Get sources from database and generate a view for each them.
  */
 public class StoreSourceAdapter extends BaseAdapter {
-    final private Context context;
-    final private LayoutInflater inflater;
-    private SourceDao sourceDao;
+    private final Context context;
+    private final LayoutInflater inflater;
+    private final SourceDao sourceDao;
     private List<Source> sources;
 
-    private LruCache<String, Bitmap> iconCache;
+    private final LruCache<String, Bitmap> iconCache;
 
     public static class ViewHolder {
         public int position;

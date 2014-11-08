@@ -27,10 +27,10 @@ public class LoadIStoreIconAsyncTask extends AsyncTask<String, Void, Bitmap> {
     final private static int MAX_FILE_LENGTH = 512 * 1024;  // 512 KiB
     final private static int MAX_CACHE_PERIOD = 3600 * 24 * 30;  // 30 days
 
-    final Context context;
-    final int position;
-    final StoreSourceAdapter.ViewHolder viewHolder;
-    final LruCache<String, Bitmap> memoryCache;
+    private final Context context;
+    private final int position;
+    private final StoreSourceAdapter.ViewHolder viewHolder;
+    private final LruCache<String, Bitmap> memoryCache;
 
     public LoadIStoreIconAsyncTask(Context context,
                                    StoreSourceAdapter.ViewHolder viewHolder,

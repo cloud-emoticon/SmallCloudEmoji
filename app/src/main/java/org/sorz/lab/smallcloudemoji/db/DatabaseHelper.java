@@ -12,8 +12,8 @@ import org.sorz.lab.smallcloudemoji.R;
 public class DatabaseHelper {
     private static DatabaseHelper ourInstance;
     private static int userCounter = 0;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
+    private final DaoMaster daoMaster;
+    private final DaoSession daoSession;
 
     public static DatabaseHelper getInstance(Context context) {
         return getInstance(context, false);

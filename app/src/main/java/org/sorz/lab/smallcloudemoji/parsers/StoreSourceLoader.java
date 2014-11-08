@@ -21,9 +21,9 @@ import java.util.List;
  * Read store xml and store sources into database.
  */
 public class StoreSourceLoader {
-    private DaoSession daoSession;
-    private SourceDao sourceDao;
-    private RepositoryDao repositoryDao;
+    private final DaoSession daoSession;
+    private final SourceDao sourceDao;
+    private final RepositoryDao repositoryDao;
 
     private static final String NAME_SPACE = null;
     private static final String ROOT_TAG = "cloudemoticonstore";
@@ -38,7 +38,8 @@ public class StoreSourceLoader {
 
     /**
      * Parse source from XML reader to databases.
-     * @param reader Reader of XML file.
+     *
+     * @param reader         Reader of XML file.
      * @param lastUpdateTime Latest update time of store.
      * @return Update time of current store (may be not changed if it's already updated so that
      * parsing is canceled.

@@ -35,18 +35,18 @@ import java.util.List;
  * Download and save a XML file.
  */
 public class DownloadAsyncTask extends AsyncTask<Repository, Integer, Integer> {
-    private Context context;
-    private DaoSession daoSession;
+    private final Context context;
+    private final DaoSession daoSession;
 
     protected static final int RESULT_CANCELLED = -1;
     protected static final int RESULT_SUCCESS = 0;
-    protected static final int RESULT_ERROR_MALFORMED_URL = 1;
-    protected static final int RESULT_ERROR_IO = 2;
-    protected static final int RESULT_ERROR_XML_PARSER = 3;
-    protected static final int RESULT_ERROR_UNKNOWN = 4;
-    protected static final int RESULT_ERROR_NOT_FOUND = 5;
-    protected static final int RESULT_ERROR_OTHER_HTTP = 6;
-    protected static final int RESULT_ERROR_UNSUPPORTED_FORMAT = 7;
+    private static final int RESULT_ERROR_MALFORMED_URL = 1;
+    private static final int RESULT_ERROR_IO = 2;
+    private static final int RESULT_ERROR_XML_PARSER = 3;
+    private static final int RESULT_ERROR_UNKNOWN = 4;
+    private static final int RESULT_ERROR_NOT_FOUND = 5;
+    private static final int RESULT_ERROR_OTHER_HTTP = 6;
+    private static final int RESULT_ERROR_UNSUPPORTED_FORMAT = 7;
 
 
     public DownloadAsyncTask(Context context) {

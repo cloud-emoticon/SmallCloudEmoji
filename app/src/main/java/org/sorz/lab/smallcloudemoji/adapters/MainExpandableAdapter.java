@@ -28,10 +28,10 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     final private Context context;
     final private LayoutInflater inflater;
 
-    private boolean showNote;
-    private boolean showSourceName;
-    private DaoSession daoSession;
-    private List<Category> categories = new ArrayList<Category>();
+    private final boolean showNote;
+    private final boolean showSourceName;
+    private final DaoSession daoSession;
+    private final List<Category> categories = new ArrayList<Category>();
 
     private static class GroupViewHolder {
         TextView category;

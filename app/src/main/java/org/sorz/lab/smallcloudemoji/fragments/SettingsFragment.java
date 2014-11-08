@@ -116,11 +116,6 @@ public class SettingsFragment extends PreferenceFragment {
         mListener = null;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     public interface OnSourceManageClickListener {
         public boolean onSourceManageClick();
     }

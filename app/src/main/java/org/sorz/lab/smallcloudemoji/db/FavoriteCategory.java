@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class FavoriteCategory extends Category {
     private List<Entry> entries;
-    private EntryDao entryDao;
+    private final EntryDao entryDao;
 
 
     public FavoriteCategory(Context context, DaoSession daoSession) {

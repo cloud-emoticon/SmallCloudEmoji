@@ -27,7 +27,7 @@ public class RepositoryJsonLoader extends RepositoryLoader {
         parser.beginObject();
         while (parser.hasNext()) {
             String name = parser.nextName();
-            if (! name.equals("categories")) {
+            if (!name.equals("categories")) {
                 parser.skipValue();
                 continue;
             }
@@ -41,7 +41,7 @@ public class RepositoryJsonLoader extends RepositoryLoader {
     }
 
 
-    public void loadCategory() throws IOException, LoadingCancelException {
+    void loadCategory() throws IOException, LoadingCancelException {
         boolean nameFound = false;
         parser.beginObject();
         while (parser.hasNext()) {
@@ -65,7 +65,7 @@ public class RepositoryJsonLoader extends RepositoryLoader {
         endCategory();
     }
 
-    public void loadEntry() throws IOException, LoadingCancelException {
+    void loadEntry() throws IOException, LoadingCancelException {
         String description = "";
         String emoticon = null;
         parser.beginObject();
