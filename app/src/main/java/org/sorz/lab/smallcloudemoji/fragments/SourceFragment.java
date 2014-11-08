@@ -3,12 +3,18 @@ package org.sorz.lab.smallcloudemoji.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.LruCache;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -62,6 +68,8 @@ public class SourceFragment extends Fragment {
                     .where(SourceDao.Properties.Id.eq(sourceId))
                     .unique();
         }
+
+        setHasOptionsMenu(true);
     }
 
     private void setTextViewIfNotNull(View view, int id, String text) {
@@ -97,8 +105,37 @@ public class SourceFragment extends Fragment {
                 ((ImageView) view.findViewById(R.id.source_icon)).setImageBitmap(icon);
         }
 
+        Button installButton = (Button) view.findViewById(R.id.install);
+        final String installUrl = source.getInstallUrl() == null ?
+                source.getCodeUrl().replaceFirst("^http", "emoticon") :
+                source.getInstallUrl();
+        installButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(installUrl));
+                intent.putExtra("source_name", source.getName());
+                startActivity(intent);
+            }
+        });
+
         return view;
     }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.source_actions, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.menu_open_browser) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(source.getStoreUrl()));
+            startActivity(intent);
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }

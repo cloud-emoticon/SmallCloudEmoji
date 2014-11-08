@@ -45,6 +45,9 @@ public class AddRepositoryActivity extends Activity {
                 urlTextView.setText("https" + uri.toString().substring(14));
             aliasTextView.requestFocus();
         }
+
+        Bundle extras = getIntent().getExtras();
+        aliasTextView.setText(extras.getString("source_name", ""));
     }
 
     public void cancel(View v) {

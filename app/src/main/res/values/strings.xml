@@ -73,5 +73,6 @@
     <string name="source_install">Install</string>
     <string name="source_maintainer">Maintainer</string>
     <string name="source_server">Server</string>
+    <string name="menu_open_browser">Open in browser</string>
 
 </resources>

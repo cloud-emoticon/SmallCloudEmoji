@@ -48,7 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/source_install"
-        android:id="@+id/button"
+        android:id="@+id/install"
         android:layout_gravity="end" />
 
     <View
