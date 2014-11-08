@@ -12,6 +12,8 @@ import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Entry;
 import org.sorz.lab.smallcloudemoji.db.Repository;
+import org.sorz.lab.smallcloudemoji.db.Source;
+import org.sorz.lab.smallcloudemoji.db.SourceDao;
 import org.sorz.lab.smallcloudemoji.exceptions.LoadingCancelException;
 import org.sorz.lab.smallcloudemoji.parsers.RepositoryJsonLoader;
 import org.sorz.lab.smallcloudemoji.parsers.RepositoryLoader;
@@ -26,6 +28,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 
 /**
@@ -109,6 +112,18 @@ public class DownloadAsyncTask extends AsyncTask<Repository, Integer, Integer> {
             });
             repositoryLoader.loadToDatabase(repository,
                     new BufferedReader(new InputStreamReader(inputStream)));
+
+            // Update source install state.
+            SourceDao sourceDao = daoSession.getSourceDao();
+            List<Source> sources = sourceDao.queryBuilder()
+                    .where(SourceDao.Properties.CodeUrl.eq(repository.getUrl()),
+                            SourceDao.Properties.Installed.eq(false))
+                    .list();
+            if (!sources.isEmpty()) {
+                for (Source source : sources)
+                    source.setInstalled(true);
+                sourceDao.updateInTx(sources);
+            }
         } catch (LoadingCancelException e) {
             return RESULT_CANCELLED;
         } catch (MalformedURLException e) {

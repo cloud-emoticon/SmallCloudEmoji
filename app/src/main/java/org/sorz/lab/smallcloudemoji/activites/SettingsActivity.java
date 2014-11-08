@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.LruCache;
@@ -29,6 +30,7 @@ public class SettingsActivity extends Activity implements
         IconCacheHolder {
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private final static String STORE_FRAGMENT_IS_SHOWING = "STORE_FRAGMENT_IS_SHOWING";
+    public final static int REQUEST_FOR_ADDING_REPOSITORY = 1;
 
     private LruCache<String, Bitmap> iconCache;
     private RepositoryFragment repositoryFragment;
@@ -95,6 +97,17 @@ public class SettingsActivity extends Activity implements
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(
                     getFragmentManager().getBackStackEntryCount() > 0);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_FOR_ADDING_REPOSITORY) {
+            if (repositoryFragment != null)
+                repositoryFragment.onActivityResult(requestCode, resultCode, data);
+            if (storeFragment != null)
+                storeFragment.onActivityResult(requestCode, resultCode, data);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

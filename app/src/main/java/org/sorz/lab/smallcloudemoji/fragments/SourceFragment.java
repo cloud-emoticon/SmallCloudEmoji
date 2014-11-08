@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.sorz.lab.smallcloudemoji.R;
+import org.sorz.lab.smallcloudemoji.activites.AddRepositoryActivity;
+import org.sorz.lab.smallcloudemoji.activites.SettingsActivity;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Source;
@@ -40,6 +42,8 @@ public class SourceFragment extends Fragment {
     private SourceDao sourceDao;
     private Source source;
     private LruCache<String, Bitmap> iconCache;
+
+    private Button installButton;
 
 
     public static SourceFragment newInstance(long sourceId) {
@@ -78,10 +82,20 @@ public class SourceFragment extends Fragment {
             textView.setText(text);
     }
 
+    private void updateInstallState() {
+        if (source.getInstalled()) {
+            installButton.setText(R.string.source_installed);
+            installButton.setEnabled(false);
+        } else {
+            installButton.setText(R.string.source_install);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_source, container, false);
+        installButton = (Button) view.findViewById(R.id.install);
 
         setTextViewIfNotNull(view, R.id.source_name, source.getName());
         setTextViewIfNotNull(view, R.id.source_introduction, source.getIntroduction());
@@ -105,21 +119,22 @@ public class SourceFragment extends Fragment {
                 ((ImageView) view.findViewById(R.id.source_icon)).setImageBitmap(icon);
         }
 
-        Button installButton = (Button) view.findViewById(R.id.install);
-        final String installUrl = source.getInstallUrl() == null ?
-                source.getCodeUrl().replaceFirst("^http", "emoticon") :
-                source.getInstallUrl();
+        // Install URL on store missing "-s" in protocol currently.
+        // So instead generating it from code URL.
+        final String installUrl = source.getCodeUrl().replaceFirst("^http", "cloudemoticon");
         installButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(installUrl));
                 intent.putExtra("source_name", source.getName());
-                startActivity(intent);
+                startActivityForResult(intent, SettingsActivity.REQUEST_FOR_ADDING_REPOSITORY);
             }
         });
 
+        updateInstallState();
         return view;
     }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.source_actions, menu);
@@ -132,10 +147,23 @@ public class SourceFragment extends Fragment {
         if (id == R.id.menu_open_browser) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(source.getStoreUrl()));
             startActivity(intent);
-
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SettingsActivity.REQUEST_FOR_ADDING_REPOSITORY) {
+            if (resultCode == AddRepositoryActivity.RESULT_SUCCESS_ADDED) {
+                updateInstallState();
+                // Poke other fragments to update themselves.
+                if (context instanceof SettingsActivity)
+                    ((SettingsActivity) context).onActivityResult(requestCode, resultCode, data);
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 }

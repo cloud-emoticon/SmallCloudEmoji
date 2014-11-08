@@ -2,6 +2,7 @@ package org.sorz.lab.smallcloudemoji.fragments;
 
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -11,6 +12,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.sorz.lab.smallcloudemoji.R;
+import org.sorz.lab.smallcloudemoji.activites.AddRepositoryActivity;
+import org.sorz.lab.smallcloudemoji.activites.SettingsActivity;
 import org.sorz.lab.smallcloudemoji.adapters.StoreSourceAdapter;
 import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
@@ -100,6 +103,17 @@ public class StoreFragment extends ListFragment implements SwipeRefreshLayout.On
                             R.string.download_unknown_error, Toast.LENGTH_SHORT).show();
             }
         }.execute(storeUrl);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SettingsActivity.REQUEST_FOR_ADDING_REPOSITORY) {
+            if (resultCode == AddRepositoryActivity.RESULT_SUCCESS_ADDED) {
+                adapter.notifyDataSetChanged();
+            }
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public interface OnSourceClickListener {

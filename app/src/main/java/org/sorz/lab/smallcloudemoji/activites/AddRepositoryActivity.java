@@ -47,7 +47,8 @@ public class AddRepositoryActivity extends Activity {
         }
 
         Bundle extras = getIntent().getExtras();
-        aliasTextView.setText(extras.getString("source_name", ""));
+        if (extras != null)
+            aliasTextView.setText(extras.getString("source_name", ""));
     }
 
     public void cancel(View v) {

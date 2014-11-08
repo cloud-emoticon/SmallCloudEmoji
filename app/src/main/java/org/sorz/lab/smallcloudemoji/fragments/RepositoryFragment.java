@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.activites.AddRepositoryActivity;
+import org.sorz.lab.smallcloudemoji.activites.SettingsActivity;
 import org.sorz.lab.smallcloudemoji.adapters.RepositoryAdapter;
 import org.sorz.lab.smallcloudemoji.db.Category;
 import org.sorz.lab.smallcloudemoji.db.CategoryDao;
@@ -33,6 +34,8 @@ import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.EntryDao;
 import org.sorz.lab.smallcloudemoji.db.Repository;
 import org.sorz.lab.smallcloudemoji.db.RepositoryDao;
+import org.sorz.lab.smallcloudemoji.db.Source;
+import org.sorz.lab.smallcloudemoji.db.SourceDao;
 import org.sorz.lab.smallcloudemoji.tasks.DownloadAsyncTask;
 
 import java.util.ArrayList;
@@ -43,7 +46,6 @@ import java.util.List;
  * A fragment representing a list of repositories.
  */
 public class RepositoryFragment extends Fragment {
-    private final static int REQUEST_FOR_ADDING_REPOSITORY = 1;
     private Context context;
     private OnEmoticonStoreClickListener mListener;
     private DaoSession daoSession;
@@ -117,7 +119,7 @@ public class RepositoryFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.menu_repository_add) {
             Intent intent = new Intent(context, AddRepositoryActivity.class);
-            startActivityForResult(intent, REQUEST_FOR_ADDING_REPOSITORY);
+            startActivityForResult(intent, SettingsActivity.REQUEST_FOR_ADDING_REPOSITORY);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -125,9 +127,10 @@ public class RepositoryFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_FOR_ADDING_REPOSITORY) {
+        if (requestCode == SettingsActivity.REQUEST_FOR_ADDING_REPOSITORY) {
             if (resultCode == AddRepositoryActivity.RESULT_SUCCESS_ADDED) {
                 notifyRepositoriesChanged();
+                super.onActivityResult(requestCode, resultCode, data);
             }
             return;
         }
@@ -300,6 +303,17 @@ public class RepositoryFragment extends Fragment {
                 daoSession.runInTx(new Runnable() {
                     @Override
                     public void run() {
+                        SourceDao sourceDao = daoSession.getSourceDao();
+                        List<Source> sources = sourceDao.queryBuilder()
+                                .where(SourceDao.Properties.CodeUrl.eq(repository.getUrl()),
+                                        SourceDao.Properties.Installed.eq(true))
+                                .list();
+                        if (!sources.isEmpty()) {
+                            for (Source source : sources)
+                                source.setInstalled(false);
+                            sourceDao.updateInTx(sources);
+                        }
+
                         daoSession.getEntryDao().queryBuilder()
                                 .where(EntryDao.Properties.CategoryId.in(categoryIds))
                                 .buildDelete().executeDeleteWithoutDetachingEntities();
