@@ -13,6 +13,7 @@ import android.widget.TextView;
 import org.sorz.lab.smallcloudemoji.R;
 import org.sorz.lab.smallcloudemoji.db.Source;
 import org.sorz.lab.smallcloudemoji.db.SourceDao;
+import org.sorz.lab.smallcloudemoji.interfaces.IconCacheHolder;
 import org.sorz.lab.smallcloudemoji.tasks.LoadIStoreIconAsyncTask;
 
 import java.util.List;
@@ -43,21 +44,7 @@ public class StoreSourceAdapter extends BaseAdapter {
         this.sourceDao = sourceDao;
         inflater = LayoutInflater.from(context);
 
-        // Get max available VM memory in KiB.
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        // Use 1/16th of the available memory for icon cache.
-        // ~70 icons in 120 x 120px for 64MiB available memory.
-        final int cacheSize = maxMemory / 16;
-
-        iconCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap bitmap) {
-                // The cache size will be measured in kilobytes rather than
-                // number of items.
-                return bitmap.getByteCount() / 1024;
-            }
-        };
-
+        iconCache = ((IconCacheHolder) context).getIconCache();
         loadSources();
     }
 

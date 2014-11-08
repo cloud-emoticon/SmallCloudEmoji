@@ -1,114 +1,136 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="org.sorz.lab.smallcloudemoji.fragments.SourceFragment"
     android:padding="6pt"
-    tools:context="org.sorz.lab.smallcloudemoji.fragments.SourceFragment">
-
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+        <ImageView
+            android:layout_width="24pt"
+            android:layout_height="24pt"
+            android:layout_marginRight="6pt"
+            android:layout_marginEnd="6pt"
+            android:layout_gravity="end"
+            android:contentDescription="@string/source_icon_description"
+            android:background="@drawable/ic_empty_avatar"
+            android:id="@+id/source_icon" />
 
-            <ImageView
-                android:layout_width="24pt"
-                android:layout_height="24pt"
-                android:layout_marginRight="6pt"
-                android:layout_marginEnd="6pt"
-                android:layout_gravity="end"
-                android:contentDescription="@string/source_icon_description"
-                android:background="@drawable/ic_empty_avatar"
-                android:id="@+id/source_icon" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text=""
+                    android:id="@+id/source_name" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="Large Text"
-                        android:id="@+id/source_name" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="2014-02-02"
-                        android:id="@+id/source_postdate" />
-
-                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:id="@+id/source_postdate" />
 
             </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Install"
-            android:id="@+id/button"
-            android:layout_gravity="end" />
+        </LinearLayout>
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:layout_marginTop="5pt"
-            android:layout_marginBottom="5pt"
-            android:background="?android:attr/dividerHorizontal" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/source_install"
+        android:id="@+id/button"
+        android:layout_gravity="end" />
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:layout_margin="5pt"
-            android:id="@+id/source_introduction"
-            android:gravity="center" />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_marginTop="5pt"
+        android:layout_marginBottom="5pt"
+        android:background="?android:attr/dividerHorizontal" />
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:layout_marginTop="3pt"
-            android:layout_marginBottom="5pt"
-            android:background="?android:attr/dividerHorizontal" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/source_default_introduction"
+        android:layout_margin="5pt"
+        android:id="@+id/source_introduction"
+        android:gravity="center" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/darker_gray"
-            android:text="Maintainer" />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_marginTop="3pt"
+        android:layout_marginBottom="5pt"
+        android:background="?android:attr/dividerHorizontal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:layout_marginBottom="5pt"
-            android:id="@+id/source_creator" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/darker_gray"
+        android:text="@string/source_maintainer" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/darker_gray"
-            android:text="Server" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/source_default_creator"
+        android:paddingLeft="5pt"
+        android:paddingStart="5pt"
+        android:id="@+id/source_creator" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
-            android:layout_marginBottom="5pt"
-            android:id="@+id/source_server" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:paddingLeft="5pt"
+        android:paddingStart="5pt"
+        android:layout_marginBottom="5pt"
+        android:id="@+id/source_creator_url"
+        android:autoLink="web|phone|email"
+        android:singleLine="true"
+        android:textColorLink="@android:color/darker_gray" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/darker_gray"
+        android:text="@string/source_server" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:paddingLeft="5pt"
+        android:paddingStart="5pt"
+        android:text="@string/source_default_server"
+        android:id="@+id/source_server" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/source_code_url"
+        android:paddingLeft="5pt"
+        android:paddingStart="5pt"
+        android:autoLink="web"
+        android:layout_marginBottom="5pt"
+        android:singleLine="true"
+        android:textColorLink="@android:color/darker_gray" />
 
 
 
-    </LinearLayout>
-</FrameLayout>
+</LinearLayout>
+

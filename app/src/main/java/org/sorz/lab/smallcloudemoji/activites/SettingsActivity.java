@@ -4,7 +4,9 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.LruCache;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -16,16 +18,19 @@ import org.sorz.lab.smallcloudemoji.fragments.RepositoryFragment;
 import org.sorz.lab.smallcloudemoji.fragments.SettingsFragment;
 import org.sorz.lab.smallcloudemoji.fragments.SourceFragment;
 import org.sorz.lab.smallcloudemoji.fragments.StoreFragment;
+import org.sorz.lab.smallcloudemoji.interfaces.IconCacheHolder;
 
 
 public class SettingsActivity extends Activity implements
         FragmentManager.OnBackStackChangedListener,
         SettingsFragment.OnSourceManageClickListener,
         RepositoryFragment.OnEmoticonStoreClickListener,
-        StoreFragment.OnSourceClickListener {
+        StoreFragment.OnSourceClickListener,
+        IconCacheHolder {
     private final static String REPOSITORY_FRAGMENT_IS_SHOWING = "REPOSITORY_FRAGMENT_IS_SHOWING";
     private final static String STORE_FRAGMENT_IS_SHOWING = "STORE_FRAGMENT_IS_SHOWING";
-    
+
+    private LruCache<String, Bitmap> iconCache;
     private RepositoryFragment repositoryFragment;
     private StoreFragment storeFragment;
     private boolean tabletLayout;
@@ -153,4 +158,24 @@ public class SettingsActivity extends Activity implements
         repositoryFragment.popMoreMenu(view);
     }
 
+    @Override
+    public synchronized LruCache<String, Bitmap> getIconCache() {
+        if (iconCache == null) {
+            // Get max available VM memory in KiB.
+            final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+            // Use 1/16th of the available memory for icon cache.
+            // ~70 icons in 120 x 120px for 64MiB available memory.
+            final int cacheSize = maxMemory / 16;
+
+            iconCache = new LruCache<String, Bitmap>(cacheSize) {
+                @Override
+                protected int sizeOf(String key, Bitmap bitmap) {
+                    // The cache size will be measured in kilobytes rather than
+                    // number of items.
+                    return bitmap.getByteCount() / 1024;
+                }
+            };
+        }
+        return iconCache;
+    }
 }

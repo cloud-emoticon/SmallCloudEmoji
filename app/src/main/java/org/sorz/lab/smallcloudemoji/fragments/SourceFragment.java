@@ -3,10 +3,13 @@ package org.sorz.lab.smallcloudemoji.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.sorz.lab.smallcloudemoji.R;
@@ -14,6 +17,9 @@ import org.sorz.lab.smallcloudemoji.db.DaoSession;
 import org.sorz.lab.smallcloudemoji.db.DatabaseHelper;
 import org.sorz.lab.smallcloudemoji.db.Source;
 import org.sorz.lab.smallcloudemoji.db.SourceDao;
+import org.sorz.lab.smallcloudemoji.interfaces.IconCacheHolder;
+
+import java.text.DateFormat;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -22,10 +28,12 @@ import org.sorz.lab.smallcloudemoji.db.SourceDao;
  */
 public class SourceFragment extends Fragment {
     private static final String SOURCE_ID = "source_id";
+
     private Context context;
     private DaoSession daoSession;
     private SourceDao sourceDao;
     private Source source;
+    private LruCache<String, Bitmap> iconCache;
 
 
     public static SourceFragment newInstance(long sourceId) {
@@ -46,6 +54,7 @@ public class SourceFragment extends Fragment {
         context = getActivity();
         daoSession = DatabaseHelper.getInstance(context).getDaoSession();
         sourceDao = daoSession.getSourceDao();
+        iconCache = ((IconCacheHolder) context).getIconCache();
 
         if (getArguments() != null) {
             long sourceId = getArguments().getLong(SOURCE_ID);
@@ -55,15 +64,39 @@ public class SourceFragment extends Fragment {
         }
     }
 
+    private void setTextViewIfNotNull(View view, int id, String text) {
+        TextView textView = (TextView) view.findViewById(id);
+        if (text != null)
+            textView.setText(text);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_source, container, false);
-        // TODO: Handle null properties.
-        ((TextView) view.findViewById(R.id.source_name)).setText(source.getName());
-        ((TextView) view.findViewById(R.id.source_introduction)).setText(source.getIntroduction());
-        ((TextView) view.findViewById(R.id.source_creator)).setText(source.getCreator());
-        ((TextView) view.findViewById(R.id.source_server)).setText(source.getServer());
+
+        setTextViewIfNotNull(view, R.id.source_name, source.getName());
+        setTextViewIfNotNull(view, R.id.source_introduction, source.getIntroduction());
+        setTextViewIfNotNull(view, R.id.source_creator, source.getCreator());
+        setTextViewIfNotNull(view, R.id.source_creator_url, source.getCreatorUrl());
+        setTextViewIfNotNull(view, R.id.source_code_url, source.getCodeUrl());
+
+        String server = source.getServer();
+        if ("dropboxusercontent.com".equals(server))
+            server = "Dropbox";
+        setTextViewIfNotNull(view, R.id.source_server, server);
+
+        String postDate = null;
+        if (source.getPostDate() != null)
+            postDate = DateFormat.getDateInstance().format(source.getPostDate());
+        setTextViewIfNotNull(view, R.id.source_postdate, postDate);
+
+        if (source.getIconUrl() != null) {
+            Bitmap icon = iconCache.get(source.getIconUrl());
+            if (icon != null)
+                ((ImageView) view.findViewById(R.id.source_icon)).setImageBitmap(icon);
+        }
+
         return view;
     }
 
