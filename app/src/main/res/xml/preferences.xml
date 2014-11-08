@@ -15,6 +15,10 @@
 
     <PreferenceCategory android:title="@string/pref_ui_title">
         <CheckBoxPreference
+            android:key="show_source_name"
+            android:title="@string/pref_show_source_name"
+            android:defaultValue="true" />
+        <CheckBoxPreference
             android:key="show_note"
             android:title="@string/pref_show_note_title"
             android:defaultValue="true" />

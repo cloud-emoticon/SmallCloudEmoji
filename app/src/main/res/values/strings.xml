@@ -74,5 +74,6 @@
     <string name="source_maintainer">Maintainer</string>
     <string name="source_server">Server</string>
     <string name="menu_open_browser">Open in browser</string>
+    <string name="pref_show_source_name">Show source name</string>
 
 </resources>

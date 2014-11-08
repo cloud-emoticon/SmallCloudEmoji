@@ -29,6 +29,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
     final private LayoutInflater inflater;
 
     private boolean showNote;
+    private boolean showSourceName;
     private DaoSession daoSession;
     private List<Category> categories = new ArrayList<Category>();
 
@@ -51,9 +52,9 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         showNote = preferences.getBoolean("show_note", true);
+        showSourceName = preferences.getBoolean("show_source_name", true);
 
         reloadCategories();
-
     }
 
     private void reloadCategories() {
@@ -138,7 +139,7 @@ public class MainExpandableAdapter extends BaseExpandableListAdapter {
 
         viewHolder.category.setText(category.getName());
         String repositoryAlias;
-        if (category instanceof FavoriteCategory) {
+        if (category instanceof FavoriteCategory || !showSourceName) {
             repositoryAlias = "";
         } else {
             repositoryAlias = category.getRepository().getAlias();
