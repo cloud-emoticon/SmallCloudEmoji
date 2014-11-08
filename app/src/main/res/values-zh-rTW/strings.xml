@@ -54,4 +54,20 @@
     <string name="repository_rename_title">新別名</string>
     <string name="toast_repository_copied">鏈接已複製</string>
     <string name="source_default_introduction">_(:з」∠)_</string>
+    <string name="menu_open_browser">在瀏覽器中查看</string>
+    <string name="please_pull_down">下拉刷新</string>
+    <string name="pref_show_source_name">顯示源別名</string>
+    <string name="see_right_side">向右看</string>
+    <string name="source_default_creator">匿名</string>
+    <string name="source_default_server">互聯網</string>
+    <string name="source_icon_description">作者頭像</string>
+    <string name="source_install">安装</string>
+    <string name="source_installed">已安裝</string>
+    <string name="source_maintainer">維護者</string>
+    <string name="source_server">伺服器</string>
+    <string name="store_server_fail">商店打烊中</string>
+    <string name="go_emoticon_store_title">進入顏文字商店</string>
+    <string name="go_emoticon_store_no_warranty">由 +Yashi 維護，不提供任何擔保</string>
+    <string name="go_emoticon_store_incomplete_translation"> </string>
+    <string name="go_emoticon_store_description">由社區提供的豐富顏文字</string>
 </resources>
