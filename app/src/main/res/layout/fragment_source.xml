@@ -49,6 +49,10 @@
         android:layout_height="wrap_content"
         android:text="@string/source_install"
         android:id="@+id/install"
+        android:paddingLeft="15pt"
+        android:paddingRight="15pt"
+        android:paddingStart="15pt"
+        android:paddingEnd="15pt"
         android:layout_gravity="end" />
 
     <View
