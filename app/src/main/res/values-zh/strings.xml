@@ -70,4 +70,5 @@
     <string name="go_emoticon_store_no_warranty">由 +Yashi 维护，不提供任何担保</string>
     <string name="go_emoticon_store_incomplete_translation"> </string>
     <string name="go_emoticon_store_description">由社区提供的丰富颜文字</string>
+    <string name="title_emoticon_store">颜文字商店</string>
 </resources>

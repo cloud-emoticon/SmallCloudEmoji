@@ -21,6 +21,8 @@ import org.sorz.lab.smallcloudemoji.fragments.SourceFragment;
 import org.sorz.lab.smallcloudemoji.fragments.StoreFragment;
 import org.sorz.lab.smallcloudemoji.interfaces.IconCacheHolder;
 
+import java.util.Stack;
+
 
 public class SettingsActivity extends Activity implements
         FragmentManager.OnBackStackChangedListener,
@@ -36,6 +38,7 @@ public class SettingsActivity extends Activity implements
     private RepositoryFragment repositoryFragment;
     private StoreFragment storeFragment;
     private boolean tabletLayout;
+    private Stack<CharSequence> titleHistory = new Stack<CharSequence>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,12 +96,23 @@ public class SettingsActivity extends Activity implements
         DatabaseHelper.getInstance(this).close();
     }
 
+    private void setActionBarTitle(int id) {
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            titleHistory.push(actionBar.getTitle());
+            titleHistory.push(getString(id));
+        }
+    }
+
     @Override
     public void onBackStackChanged() {
         ActionBar actionBar = getActionBar();
-        if (actionBar != null)
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(
                     getFragmentManager().getBackStackEntryCount() > 0);
+            if (!titleHistory.empty())
+                actionBar.setTitle(titleHistory.pop());
+        }
     }
 
     @Override
@@ -116,6 +130,7 @@ public class SettingsActivity extends Activity implements
     public boolean onSourceManageClick() {
         if (tabletLayout)
             return false;
+        setActionBarTitle(R.string.pref_source_manage_title);
         FragmentManager fragmentManager = getFragmentManager();
         Fragment settingsFragment = fragmentManager.findFragmentById(R.id.settings_frag);
         if (repositoryFragment == null)
@@ -130,6 +145,7 @@ public class SettingsActivity extends Activity implements
 
     @Override
     public void onEmoticonStoreClick() {
+        setActionBarTitle(R.string.title_emoticon_store);
         FragmentManager fragmentManager = getFragmentManager();
         if (storeFragment == null)
             storeFragment = StoreFragment.newInstance(getString(R.string.store_url));
@@ -142,6 +158,7 @@ public class SettingsActivity extends Activity implements
 
     @Override
     public void onSourceClick(long sourceId) {
+        setActionBarTitle(R.string.title_emoticon_store);
         FragmentManager fragmentManager = getFragmentManager();
         SourceFragment sourceFragment = SourceFragment.newInstance(sourceId);
         fragmentManager.beginTransaction()
